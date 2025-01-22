@@ -1,0 +1,8 @@
+{
+    "ruff.lint.args": [
+      "--config=${workspaceFolder}/pyproject.toml"
+    ],
+    "ruff.format.args": [
+      "--config=${workspaceFolder}/pyproject.toml"
+    ]
+  }
