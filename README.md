@@ -33,6 +33,14 @@ This package is designed to perform color correction on images using the Color C
 - **Accuracy**: Leverage the color correction matrix for precise color adjustments.
 - **Flexibility**: Adaptable for various image sets with different color profiles.
 
+<!-- write reference -->
+## 📚 References
+- [Color Checker Classic 24 Patch Card](https://www.xrite.com/categories/calibration-profiling/colorchecker-classic)
+- [Color Correction Tool ML](https://github.com/collinswakholi/ML_ColorCorrection_tool/tree/Pip_package)
+- [Colour Science Python](https://www.colour-science.org/colour-checker-detection/)
+- [Fast and Robust Multiple ColorChecker Detection ()](https://github.com/pedrodiamel/colorchecker-detection)
+- [Automatic color correction with OpenCV and Python (PyImageSearch)](https://pyimagesearch.com/2021/02/15/automatic-color-correction-with-opencv-and-python/)
+
 ---
 
 Happy Color Correcting! 🌟
