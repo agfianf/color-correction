@@ -13,13 +13,12 @@ from color_correction_asdfghjkl.utils.yolo_utils import (
 
 
 class YOLOv8CardDetector(BaseCardDetector):
-    """Implements card detection using YOLOv8 methods
-    derived from the source below.
-
+    """YOLOv8CardDetector is a class that implements card detection
+    using the YOLOv8 model.
 
     Reference
     ---------
-        https://github.com/ibaiGorordo/ONNX-YOLOv8-Object-Detection/blob/main/yolov8/YOLOv8.py
+    https://github.com/ibaiGorordo/ONNX-YOLOv8-Object-Detection/blob/main/yolov8/YOLOv8.py
 
     """
 
@@ -28,17 +27,30 @@ class YOLOv8CardDetector(BaseCardDetector):
         path: str,
         conf_th: float = 0.15,
         iou_th: float = 0.5,
+        half: bool = False,
     ) -> None:
         self.conf_threshold = conf_th
         self.iou_threshold = iou_th
+        self.half = half
         self.__initialize_model(path)
 
     def detect(self, image: np.ndarray) -> DetectionResult:
+        """
+        Detect objects in the given image using YOLOv8 model.
+
+        Parameters
+        ----------
+        image : np.ndarray
+            The input image BGR in which to detect objects.
+
+        Returns
+        -------
+        DetectionResult
+            A dataclass containing detected bounding boxes, confidence scores,
+            and class IDs.
+        """
         input_tensor = self.__prepare_input(image)
-
-        # Perform inference on the image
         outputs = self.__inference(input_tensor)
-
         boxes, scores, class_ids = self.__process_output(outputs)
 
         det_res = DetectionResult(
@@ -73,7 +85,10 @@ class YOLOv8CardDetector(BaseCardDetector):
         # Scale input pixel values to 0 to 1
         input_img = input_img / 255.0
         input_img = input_img.transpose(2, 0, 1)
-        input_tensor = input_img[np.newaxis, :, :, :].astype(np.float16)
+        if self.half:
+            input_tensor = input_img[np.newaxis, :, :, :].astype(np.float16)
+        else:
+            input_tensor = input_img[np.newaxis, :, :, :].astype(np.float32)
 
         return input_tensor
 
@@ -167,10 +182,13 @@ class YOLOv8CardDetector(BaseCardDetector):
 if __name__ == "__main__":
     print("YOLOv8CardDetector")
     model_path = "color_correction_asdfghjkl/asset/.model/yv8-det.onnx"
-    image_path = "color_correction_asdfghjkl/asset/images/cc-19.png"
-    detector = YOLOv8CardDetector(model_path, conf_th=0.85)
+    # image_path = "color_correction_asdfghjkl/asset/images/Test 19.png"
+    image_path = "color_correction_asdfghjkl/asset/images/cc-1.jpg"
+    detector = YOLOv8CardDetector(model_path, conf_th=0.15, iou_th=0.7, half=True)
 
     input_image = cv2.imread(image_path)
+    # input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
+    # input_image = cv2.resize(input_image, (640, 640))
     result = detector.detect(input_image)
     result.print_summary()
     image_drawed = result.draw_detections(input_image)

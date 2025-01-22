@@ -94,7 +94,7 @@ def draw_detections(
     det_img = image.copy()
 
     img_height, img_width = image.shape[:2]
-    font_size = min([img_height, img_width]) * 0.0006
+    font_size = min([img_height, img_width]) * 0.0005
     text_thickness = int(min([img_height, img_width]) * 0.001)
 
     det_img = draw_masks(det_img, boxes, class_ids, mask_alpha)
