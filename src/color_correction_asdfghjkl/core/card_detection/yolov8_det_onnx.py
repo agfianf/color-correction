@@ -26,7 +26,7 @@ class YOLOv8CardDetector(BaseCardDetector):
         self,
         path: str,
         conf_th: float = 0.15,
-        iou_th: float = 0.5,
+        iou_th: float = 0.7,
         half: bool = False,
     ) -> None:
         self.conf_threshold = conf_th
@@ -71,26 +71,33 @@ class YOLOv8CardDetector(BaseCardDetector):
         self.__get_input_details()
         self.__get_output_details()
 
-    def __prepare_input(self, image: np.ndarray) -> np.ndarray:
-        self.img_height, self.img_width = image.shape[:2]
+    def __prepare_input(self, original_image: np.ndarray) -> np.ndarray:
+        [height, width, _] = original_image.shape
 
-        input_img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # expected shape based on model input
+        expected_width = self.input_width
+        expected_height = self.input_height
+        expected_length = min((expected_height, expected_width))
 
-        # Resize input image
-        input_img = cv2.resize(
-            input_img,
-            (self.input_width, self.input_height),
-        )
+        length = max((height, width))
+        # self.scale_to_expected = expected_length / length
+        self.scale_to_ori = length / expected_length
 
-        # Scale input pixel values to 0 to 1
-        input_img = input_img / 255.0
-        input_img = input_img.transpose(2, 0, 1)
+        image = np.zeros((length, length, 3), np.uint8)
+        image[0:height, 0:width] = original_image
+
+        input_image = cv2.resize(image, (expected_width, expected_height))
+
         if self.half:
-            input_tensor = input_img[np.newaxis, :, :, :].astype(np.float16)
+            input_image = (input_image / 255.0).astype(np.float16)
         else:
-            input_tensor = input_img[np.newaxis, :, :, :].astype(np.float32)
+            input_image = (input_image / 255.0).astype(np.float32)
+        # Channel first
+        input_image = input_image.transpose(2, 0, 1)
 
-        return input_tensor
+        # Expand dimensions
+        input_image = np.expand_dims(input_image, axis=0)
+        return input_image
 
     def __inference(self, input_tensor: np.ndarray) -> list[np.ndarray]:
         start = time.perf_counter()  # noqa: F841
@@ -152,18 +159,7 @@ class YOLOv8CardDetector(BaseCardDetector):
 
     def __rescale_boxes(self, boxes: np.ndarray) -> np.ndarray:
         # Rescale boxes to original image dimensions
-        input_shape = np.array(
-            [
-                self.input_width,
-                self.input_height,
-                self.input_width,
-                self.input_height,
-            ],
-        )
-        boxes = np.divide(boxes, input_shape, dtype=np.float32)
-        boxes *= np.array(
-            [self.img_width, self.img_height, self.img_width, self.img_height],
-        )
+        boxes *= self.scale_to_ori
         return boxes
 
     def __get_input_details(self) -> None:
@@ -182,12 +178,11 @@ class YOLOv8CardDetector(BaseCardDetector):
 if __name__ == "__main__":
     print("YOLOv8CardDetector")
     model_path = "color_correction_asdfghjkl/asset/.model/yv8-det.onnx"
-    # image_path = "color_correction_asdfghjkl/asset/images/Test 19.png"
     image_path = "color_correction_asdfghjkl/asset/images/cc-1.jpg"
+    image_path = "color_correction_asdfghjkl/asset/images/Test 19.png"
     detector = YOLOv8CardDetector(model_path, conf_th=0.15, iou_th=0.7, half=True)
 
     input_image = cv2.imread(image_path)
-    # input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
     # input_image = cv2.resize(input_image, (640, 640))
     result = detector.detect(input_image)
     result.print_summary()
