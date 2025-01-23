@@ -6,3 +6,6 @@ yolo-export-onnx:
 	simplify=True \
 	dynamic=False \
 	half=True
+
+test:
+	pytest tests -v
