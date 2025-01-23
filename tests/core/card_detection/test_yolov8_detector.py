@@ -7,7 +7,7 @@ from color_correction_asdfghjkl.core.card_detection.yolov8_det_onnx import (
 
 
 @pytest.mark.skip(reason="Test is not implemented")
-def test_detector_init(sample_image: np.ndarray):
+def test_detector_init(sample_image: np.ndarray) -> None:
     detector = YOLOv8CardDetector(use_gpu=False)
     result = detector.detect(sample_image)
     assert result is not None
