@@ -10,3 +10,5 @@ wheels/
 .venv
 *.onnx
 *.pt
+*.DS_Store
+.bak/
