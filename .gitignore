@@ -8,3 +8,8 @@ wheels/
 
 # Virtual environments
 .venv
+*.onnx
+*.pt
+*.DS_Store
+.bak/
+*.coverage
