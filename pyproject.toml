@@ -25,15 +25,18 @@ analyze = [
     "matplotlib>=3.10.0",
 ]
 yolodet = [
+    "onnx>=1.17.0",
     "onnxruntime>=1.20.1",
 ]
 mccdet = [
     "opencv-contrib-python>=4.11.0.86",
 ]
 dev = [
-    "onnx>=1.17.0",
+    "pytest-cov==6.0.0",
     "pytest>=8.3.4",
     "ruff>=0.9.2",
+]
+dev-model = [
     "ultralytics>=8.3.65",
 ]
 

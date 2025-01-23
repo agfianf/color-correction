@@ -26,13 +26,17 @@ jobs:
         with:
           version: "0.5.23"
           enable-cache: true
+          cache-dependency-glob: "uv.lock"
           python-version: ${{ matrix.python-version }}
       
       - name: Install the project
-        run: uv sync --all-groups
+        run: uv sync --all-groups --no-group dev-model
 
       - name: Checking linter and formatting
         run: uvx ruff check
 
       - name: Run tests
         run: uv run pytest tests -v
+      
+      - name: Test with Coverage
+        run: uv run pytest --cov=src tests/
