@@ -41,7 +41,4 @@ This package is designed to perform color correction on images using the Color C
 - [Fast and Robust Multiple ColorChecker Detection ()](https://github.com/pedrodiamel/colorchecker-detection)
 - [Automatic color correction with OpenCV and Python (PyImageSearch)](https://pyimagesearch.com/2021/02/15/automatic-color-correction-with-opencv-and-python/)
 - [ONNX-YOLOv8-Object-Detection](https://github.com/ibaiGorordo/ONNX-YOLOv8-Object-Detection)
-
----
-
-Happy Color Correcting! 🌟
+- [yolov8-triton](https://github.com/omarabid59/yolov8-triton/tree/main)
