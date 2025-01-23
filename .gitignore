@@ -12,3 +12,4 @@ wheels/
 *.pt
 *.DS_Store
 .bak/
+*.coverage
