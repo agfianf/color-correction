@@ -24,7 +24,20 @@ COLORS = rng.uniform(0, 255, size=(len(class_names), 3))
 
 # Detection Processing Functions
 def nms(boxes: np.ndarray, scores: np.ndarray, iou_threshold: float) -> list[int]:
-    """Apply non-maximum suppression to boxes.
+    """Apply Non-Maximum Suppression (NMS) to filter overlapping bounding boxes.
+
+    NMS is used to eliminate redundant bounding boxes in object detection tasks.
+    It selects the bounding boxes with the highest confidence scores while
+    removing boxes that overlap significantly with them.
+
+    Logic:
+    - No Overlap (IoU = 0):
+      Boxes are retained as they do not affect each other.
+    - High Overlap (IoU > threshold):
+      The box with the lower confidence score is removed, as it is considered
+      a duplicate detection of the same object.
+    - Low Overlap (IoU < threshold):
+      Both boxes are retained, as they are considered detections of different objects.
 
     Parameters
     ----------
@@ -38,25 +51,30 @@ def nms(boxes: np.ndarray, scores: np.ndarray, iou_threshold: float) -> list[int
     Returns
     -------
     list[int]
-        Indices of boxes to keep after NMS.
+        Indices of the bounding boxes to keep after applying NMS.
     """
     # Sort by score
     sorted_indices = np.argsort(scores)[::-1]
-
     keep_boxes = []
+
     while sorted_indices.size > 0:
         # Pick the last box
         box_id = sorted_indices[0]
         keep_boxes.append(box_id)
 
+        # if just only one box, then break
+        if sorted_indices.size == 1:
+            break
+
         # Compute IoU of the picked box with the rest
         ious = compute_iou(boxes[box_id, :], boxes[sorted_indices[1:], :])
 
-        # Remove boxes with IoU over the threshold
+        # Remove boxes with IoU over the threshold,
+        print("ious:", ious)
         keep_indices = np.where(ious < iou_threshold)[0]
 
-        # print(keep_indices.shape, sorted_indices.shape)
-        sorted_indices = sorted_indices[keep_indices + 1]
+        # update sorted_indices
+        sorted_indices = sorted_indices[1:][keep_indices]
 
     return keep_boxes
 
