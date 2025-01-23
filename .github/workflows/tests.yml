@@ -31,8 +31,8 @@ jobs:
       - name: Install the project
         run: uv sync --all-groups
 
-      - name: Checking inter and formatting
-        run: uv run pre-commit
+      - name: Checking linter and formatting
+        run: uvx ruff check
 
       - name: Run tests
         run: uv run pytest tests -v
