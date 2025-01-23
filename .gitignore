@@ -13,3 +13,5 @@ wheels/
 *.DS_Store
 .bak/
 *.coverage
+.pytest_cache/
+.ruff_cache/
