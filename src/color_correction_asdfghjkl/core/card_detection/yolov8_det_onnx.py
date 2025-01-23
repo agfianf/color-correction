@@ -6,6 +6,7 @@ import onnxruntime
 
 from color_correction_asdfghjkl.core.card_detection.base import BaseCardDetector
 from color_correction_asdfghjkl.schemas.yolov8_det import DetectionResult
+from color_correction_asdfghjkl.utils.downloader import downloader_model_yolov8
 from color_correction_asdfghjkl.utils.yolo_utils import (
     multiclass_nms,
     xywh2xyxy,
@@ -24,14 +25,17 @@ class YOLOv8CardDetector(BaseCardDetector):
 
     def __init__(
         self,
-        path: str,
         conf_th: float = 0.15,
         iou_th: float = 0.7,
-        half: bool = False,
+        path: str | None = None,
+        use_gpu: bool = False,
     ) -> None:
         self.conf_threshold = conf_th
         self.iou_threshold = iou_th
-        self.half = half
+        self.use_gpu = use_gpu
+        if path is None:
+            print("Auto downloading YOLOv8 model...")
+            path = downloader_model_yolov8(use_gpu)
         self.__initialize_model(path)
 
     def detect(self, image: np.ndarray) -> DetectionResult:
@@ -88,7 +92,7 @@ class YOLOv8CardDetector(BaseCardDetector):
 
         input_image = cv2.resize(image, (expected_width, expected_height))
 
-        if self.half:
+        if self.use_gpu:
             input_image = (input_image / 255.0).astype(np.float16)
         else:
             input_image = (input_image / 255.0).astype(np.float32)
@@ -180,7 +184,7 @@ if __name__ == "__main__":
     model_path = "color_correction_asdfghjkl/asset/.model/yv8-det.onnx"
     image_path = "color_correction_asdfghjkl/asset/images/cc-1.jpg"
     image_path = "color_correction_asdfghjkl/asset/images/Test 19.png"
-    detector = YOLOv8CardDetector(model_path, conf_th=0.15, iou_th=0.7, half=True)
+    detector = YOLOv8CardDetector(conf_th=0.15, iou_th=0.7, use_gpu=True)
 
     input_image = cv2.imread(image_path)
     # input_image = cv2.resize(input_image, (640, 640))

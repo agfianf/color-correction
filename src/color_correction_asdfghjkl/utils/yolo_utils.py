@@ -1,13 +1,28 @@
+"""YOLOv8 utility functions for object detection tasks.
+
+This module provides utility functions for processing YOLOv8 detections, including:
+- Non-maximum suppression (NMS)
+- Bounding box conversions
+- Drawing functions for visualization
+"""
+
 import cv2
 import numpy as np
 
 from color_correction_asdfghjkl.constant.yolov8_det import class_names
 
-# Create a list of colors for each class where each color is a tuple of 3 integer values
-rng = np.random.default_rng(3)
-colors = rng.uniform(0, 255, size=(len(class_names), 3))
+# Constants
+RANDOM_SEED = 3
+DEFAULT_COLOR = (0, 0, 255)
+DEFAULT_THICKNESS = 2
+DEFAULT_MASK_ALPHA = 0.3
+
+# Initialize colors for visualization
+rng = np.random.default_rng(RANDOM_SEED)
+COLORS = rng.uniform(0, 255, size=(len(class_names), 3))
 
 
+# Detection Processing Functions
 def nms(boxes: np.ndarray, scores: np.ndarray, iou_threshold: float) -> list[int]:
     """Apply non-maximum suppression to boxes.
 
@@ -142,12 +157,13 @@ def xywh2xyxy(x: np.ndarray) -> np.ndarray:
     return y
 
 
+# Visualization Functions
 def draw_detections(
     image: np.ndarray,
     boxes: list[list[int]],
     scores: list[float],
     class_ids: list[int],
-    mask_alpha: float = 0.3,
+    mask_alpha: float = DEFAULT_MASK_ALPHA,
 ) -> np.ndarray:
     """Draw detection boxes, labels and masks on the image.
 
@@ -162,7 +178,7 @@ def draw_detections(
     class_ids : list[int]
         List of class IDs for each detection.
     mask_alpha : float, optional
-        Transparency of the mask overlay, by default 0.3.
+        Transparency of the mask overlay, by default DEFAULT_MASK_ALPHA.
 
     Returns
     -------
@@ -170,22 +186,23 @@ def draw_detections(
         Image with drawn detections.
     """
     det_img = image.copy()
-
     img_height, img_width = image.shape[:2]
+
+    # Calculate font and text properties based on image size
     font_size = min([img_height, img_width]) * 0.0005
     text_thickness = int(min([img_height, img_width]) * 0.001)
 
+    # Draw masks first (background layer)
     det_img = draw_masks(det_img, boxes, class_ids, mask_alpha)
 
-    # Draw bounding boxes and labels of detections
+    # Draw boxes and labels (foreground layer)
     for class_id, box, score in zip(class_ids, boxes, scores, strict=False):
-        color = colors[class_id]
-
+        color = COLORS[class_id]
         draw_box(det_img, box, color)
 
-        label = class_names[class_id]
-        caption = f"{label} {int(score * 100)}%"
-        draw_text(det_img, caption, box, color, font_size, text_thickness)
+        # Create and draw label
+        label = f"{class_names[class_id]} {int(score * 100)}%"
+        draw_text(det_img, label, box, color, font_size, text_thickness)
 
     return det_img
 
@@ -193,8 +210,8 @@ def draw_detections(
 def draw_box(
     image: np.ndarray,
     box: list[int],
-    color: tuple[int, int, int] = (0, 0, 255),
-    thickness: int = 2,
+    color: tuple[int, int, int] = DEFAULT_COLOR,
+    thickness: int = DEFAULT_THICKNESS,
 ) -> np.ndarray:
     """Draw a bounding box on the image.
 
@@ -205,9 +222,9 @@ def draw_box(
     box : list[int]
         Bounding box coordinates in format (x1, y1, x2, y2).
     color : tuple[int, int, int], optional
-        RGB color for the box, by default (0, 0, 255).
+        RGB color for the box, by default DEFAULT_COLOR.
     thickness : int, optional
-        Line thickness of the box, by default 2.
+        Line thickness of the box, by default DEFAULT_THICKNESS.
 
     Returns
     -------
@@ -222,7 +239,7 @@ def draw_text(
     image: np.ndarray,
     text: str,
     box: list[int],
-    color: tuple[int, int, int] = (0, 0, 255),
+    color: tuple[int, int, int] = DEFAULT_COLOR,
     font_size: float = 0.001,
     text_thickness: int = 2,
 ) -> np.ndarray:
@@ -237,7 +254,7 @@ def draw_text(
     box : list[int]
         Bounding box coordinates where text will be placed.
     color : tuple[int, int, int], optional
-        RGB color for text background, by default (0, 0, 255).
+        RGB color for text background, by default DEFAULT_COLOR.
     font_size : float, optional
         Size of the font, by default 0.001.
     text_thickness : int, optional
@@ -275,7 +292,7 @@ def draw_masks(
     image: np.ndarray,
     boxes: list[list[int]],
     classes: list[int],
-    mask_alpha: float = 0.3,
+    mask_alpha: float = DEFAULT_MASK_ALPHA,
 ) -> np.ndarray:
     """Draw semi-transparent masks for detection boxes.
 
@@ -288,7 +305,7 @@ def draw_masks(
     classes : list[int]
         List of class IDs for each box.
     mask_alpha : float, optional
-        Transparency of the mask overlay, by default 0.3.
+        Transparency of the mask overlay, by default DEFAULT_MASK_ALPHA.
 
     Returns
     -------
@@ -299,7 +316,7 @@ def draw_masks(
 
     # Draw bounding boxes and labels of detections
     for box, class_id in zip(boxes, classes, strict=False):
-        color = colors[class_id]
+        color = COLORS[class_id]
 
         x1, y1, x2, y2 = box
 
