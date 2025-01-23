@@ -1,5 +1,3 @@
-"""source: https://github.com/ibaiGorordo/ONNX-YOLOv8-Object-Detection/blob/main/yolov8/utils.py"""
-
 import cv2
 import numpy as np
 
@@ -11,6 +9,22 @@ colors = rng.uniform(0, 255, size=(len(class_names), 3))
 
 
 def nms(boxes: np.ndarray, scores: np.ndarray, iou_threshold: float) -> list[int]:
+    """Apply non-maximum suppression to boxes.
+
+    Parameters
+    ----------
+    boxes : np.ndarray
+        Array of bounding boxes in format (x1, y1, x2, y2).
+    scores : np.ndarray
+        Array of confidence scores for each box.
+    iou_threshold : float
+        IoU threshold for filtering overlapping boxes.
+
+    Returns
+    -------
+    list[int]
+        Indices of boxes to keep after NMS.
+    """
     # Sort by score
     sorted_indices = np.argsort(scores)[::-1]
 
@@ -38,6 +52,24 @@ def multiclass_nms(
     class_ids: np.ndarray,
     iou_threshold: float,
 ) -> list[int]:
+    """Apply non-maximum suppression to boxes across multiple classes.
+
+    Parameters
+    ----------
+    boxes : np.ndarray
+        Array of bounding boxes in format (x1, y1, x2, y2).
+    scores : np.ndarray
+        Array of confidence scores for each box.
+    class_ids : np.ndarray
+        Array of class IDs for each box.
+    iou_threshold : float
+        IoU threshold for filtering overlapping boxes.
+
+    Returns
+    -------
+    list[int]
+        Indices of boxes to keep after multiclass NMS.
+    """
     unique_class_ids = np.unique(class_ids)
 
     keep_boxes = []
@@ -52,6 +84,20 @@ def multiclass_nms(
 
 
 def compute_iou(box: np.ndarray, boxes: np.ndarray) -> np.ndarray:
+    """Compute Intersection over Union between a box and an array of boxes.
+
+    Parameters
+    ----------
+    box : np.ndarray
+        Single box in format (x1, y1, x2, y2).
+    boxes : np.ndarray
+        Array of boxes to compute IoU with.
+
+    Returns
+    -------
+    np.ndarray
+        Array of IoU values between the input box and each box in boxes.
+    """
     box = box.astype(np.float32)
     boxes = boxes.astype(np.float32)
 
@@ -75,6 +121,18 @@ def compute_iou(box: np.ndarray, boxes: np.ndarray) -> np.ndarray:
 
 
 def xywh2xyxy(x: np.ndarray) -> np.ndarray:
+    """Convert bounding box format from (x, y, w, h) to (x1, y1, x2, y2).
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Array of boxes in (x, y, w, h) format.
+
+    Returns
+    -------
+    np.ndarray
+        Array of boxes in (x1, y1, x2, y2) format.
+    """
     # Convert bounding box (x, y, w, h) to bounding box (x1, y1, x2, y2)
     y = np.copy(x)
     y[..., 0] = x[..., 0] - x[..., 2] / 2
@@ -91,6 +149,26 @@ def draw_detections(
     class_ids: list[int],
     mask_alpha: float = 0.3,
 ) -> np.ndarray:
+    """Draw detection boxes, labels and masks on the image.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        Input image to draw on.
+    boxes : list[list[int]]
+        List of bounding boxes in format (x1, y1, x2, y2).
+    scores : list[float]
+        List of confidence scores for each detection.
+    class_ids : list[int]
+        List of class IDs for each detection.
+    mask_alpha : float, optional
+        Transparency of the mask overlay, by default 0.3.
+
+    Returns
+    -------
+    np.ndarray
+        Image with drawn detections.
+    """
     det_img = image.copy()
 
     img_height, img_width = image.shape[:2]
@@ -118,6 +196,24 @@ def draw_box(
     color: tuple[int, int, int] = (0, 0, 255),
     thickness: int = 2,
 ) -> np.ndarray:
+    """Draw a bounding box on the image.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        Input image to draw on.
+    box : list[int]
+        Bounding box coordinates in format (x1, y1, x2, y2).
+    color : tuple[int, int, int], optional
+        RGB color for the box, by default (0, 0, 255).
+    thickness : int, optional
+        Line thickness of the box, by default 2.
+
+    Returns
+    -------
+    np.ndarray
+        Image with drawn box.
+    """
     x1, y1, x2, y2 = box
     return cv2.rectangle(image, (x1, y1), (x2, y2), color, thickness)
 
@@ -130,6 +226,28 @@ def draw_text(
     font_size: float = 0.001,
     text_thickness: int = 2,
 ) -> np.ndarray:
+    """Draw text with background on the image.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        Input image to draw on.
+    text : str
+        Text to be drawn.
+    box : list[int]
+        Bounding box coordinates where text will be placed.
+    color : tuple[int, int, int], optional
+        RGB color for text background, by default (0, 0, 255).
+    font_size : float, optional
+        Size of the font, by default 0.001.
+    text_thickness : int, optional
+        Thickness of the text, by default 2.
+
+    Returns
+    -------
+    np.ndarray
+        Image with drawn text.
+    """
     x1, y1, x2, y2 = box
     (tw, th), _ = cv2.getTextSize(
         text=text,
@@ -159,6 +277,24 @@ def draw_masks(
     classes: list[int],
     mask_alpha: float = 0.3,
 ) -> np.ndarray:
+    """Draw semi-transparent masks for detection boxes.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        Input image to draw on.
+    boxes : list[list[int]]
+        List of bounding boxes in format (x1, y1, x2, y2).
+    classes : list[int]
+        List of class IDs for each box.
+    mask_alpha : float, optional
+        Transparency of the mask overlay, by default 0.3.
+
+    Returns
+    -------
+    np.ndarray
+        Image with drawn masks.
+    """
     mask_img = image.copy()
 
     # Draw bounding boxes and labels of detections
