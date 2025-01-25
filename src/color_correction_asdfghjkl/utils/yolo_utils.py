@@ -70,7 +70,6 @@ def nms(boxes: np.ndarray, scores: np.ndarray, iou_threshold: float) -> list[int
         ious = compute_iou(boxes[box_id, :], boxes[sorted_indices[1:], :])
 
         # Remove boxes with IoU over the threshold,
-        print("ious:", ious)
         keep_indices = np.where(ious < iou_threshold)[0]
 
         # update sorted_indices
