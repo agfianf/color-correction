@@ -1,7 +1,7 @@
 [project]
 name = "color-correction-asdfghjkl"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.0.1-alpha"
+description = "help to do color correction on images based on color checker card classic 24 patch."
 readme = "README.md"
 authors = [
     { name = "magfianf", email = "muhammadagfian96@gmail.com" }
