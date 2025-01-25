@@ -11,6 +11,8 @@ dependencies = [
     "httpx>=0.28.1",
     "pydantic>=2.10.5",
     "pydantic-settings>=2.7.1",
+    "shapely>=2.0.6",
+    "colour-science>=0.4.6",
 ]
 
 [build-system]
