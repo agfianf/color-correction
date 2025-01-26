@@ -1,7 +1,8 @@
 [project]
 name = "color-correction-asdfghjkl"
-version = "0.0.1-alpha"
+version = "0.0.1a1"
 description = "help to do color correction on images based on color checker card classic 24 patch."
+keywords = ["color correction", "color-correction", "color consistency", "color-consistency"]
 readme = "README.md"
 authors = [
     { name = "magfianf", email = "muhammadagfian96@gmail.com" }
@@ -14,10 +15,20 @@ dependencies = [
     "shapely>=2.0.6",
     "colour-science>=0.4.6",
 ]
+classifiers = [
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Operating System :: OS Independent',
+    'Typing :: Typed'
+]
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+
+[project.urls]
+Repository = "https://github.com/agfianf/color-correction-asdfghjkl"
+Issues = "https://github.com/agfianf/color-correction-asdfghjkl/issues"
+
 
 [dependency-groups]
 default = [
@@ -41,6 +52,15 @@ dev = [
 dev-model = [
     "ultralytics>=8.3.65",
 ]
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["color_correction_asdfghjkl"]
 
 # ---- ruff ----
 [tool.ruff]
