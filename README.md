@@ -33,6 +33,31 @@ This package is designed to perform color correction on images using the Color C
 - **Accuracy**: Leverage the color correction matrix for precise color adjustments.
 - **Flexibility**: Adaptable for various image sets with different color profiles.
 
+## Installation
+
+```bash
+pip install color-correction-asdfghjkl
+```
+## Usage
+
+```python
+import cv2
+
+from color_correction_asdfghjkl import ColorCorrection
+
+cc = ColorCorrection(
+    detection_model="yolov8",
+    correction_model="least_squares",
+    use_gpu=False,
+)
+
+input_image = cv2.imread("cc-19.png")
+cc.fit(input_image=input_image)
+corrected_image = cc.correct_image(input_image=input_image)
+cv2.imwrite("corrected_image.png", corrected_image)
+```
+
+
 <!-- write reference -->
 ## 📚 References
 - [Color Checker Classic 24 Patch Card](https://www.xrite.com/categories/calibration-profiling/colorchecker-classic)

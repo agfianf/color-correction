@@ -52,7 +52,7 @@ def download_google_drive_file(file_id: str, output_file: str) -> None:
 
 def downloader_model_yolov8(use_gpu: bool = False) -> str:
     specs = get_device_specs()
-    model_folder = "color_correction_asdfghjkl/asset/.model"
+    model_folder = os.path.join(os.getcwd(), "tmp", "models")
     if use_gpu:
         if specs.is_apple_silicon:
             print("Apple Silicon device detected.")
