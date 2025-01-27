@@ -56,7 +56,8 @@ cc.fit(input_image=input_image)
 corrected_image = cc.correct_image(input_image=input_image)
 cv2.imwrite("corrected_image.png", corrected_image)
 ```
-
+Sample output:
+![Sample Output](assets/sample-output-usage.png)
 
 <!-- write reference -->
 ## 📚 References
