@@ -9,17 +9,27 @@ from color_correction_asdfghjkl.constant.color_checker import reference_color_d5
 from color_correction_asdfghjkl.core.card_detection.det_yv8_onnx import (
     YOLOv8CardDetector,
 )
-from color_correction_asdfghjkl.core.correction.least_squares import (
+from color_correction_asdfghjkl.core.correction import (
+    AffineReg,
     LeastSquaresRegression,
+    LinearReg,
+    Polynomial,
 )
 from color_correction_asdfghjkl.processor.det_yv8 import DetectionProcessor
 from color_correction_asdfghjkl.utils.image_processing import (
     compare_viz_two_patches,
+    display_image_grid,
     generate_image_patches,
 )
 
 ColorPatchType = NDArray[np.uint8]
 ImageType = NDArray[np.uint8]
+LiteralModelCorrection = Literal[
+    "least_squares",
+    "polynomial",
+    "linear_reg",
+    "affine_reg",
+]
 
 
 class ColorCorrection:
@@ -40,18 +50,29 @@ class ColorCorrection:
     def __init__(
         self,
         detection_model: Literal["yolov8"] = "yolov8",
-        correction_model: Literal["least_squares"] = "least_squares",
+        correction_model: LiteralModelCorrection = "least_squares",
         reference_color_card: str | None = None,
         use_gpu: bool = True,
     ) -> None:
         self.reference_color_card = reference_color_card or reference_color_d50_bgr
         self.correction_model = self._initialize_correction_model(correction_model)
         self.card_detector = self._initialize_detector(detection_model, use_gpu)
-        self.correction_weights: np.ndarray | None = None
+        self.trained_model = None
+
+    @property
+    def model_name(self) -> str:
+        return self.correction_model.__class__.__name__
 
     def _initialize_correction_model(self, model_name: str) -> LeastSquaresRegression:
-        if model_name == "least_squares":
-            return LeastSquaresRegression()
+        d_model_selection = {
+            "least_squares": LeastSquaresRegression(),
+            "polynomial": Polynomial(),
+            "linear_reg": LinearReg(),
+            "affine_reg": AffineReg(),
+        }
+        selected_model = d_model_selection.get(model_name)
+        if selected_model:
+            return selected_model
         raise ValueError(f"Unsupported correction model: {model_name}")
 
     def _initialize_detector(
@@ -115,11 +136,11 @@ class ColorCorrection:
         if reference_patches is None:
             reference_patches = self.reference_color_card
 
-        self.correction_weights = self.correction_model.fit(
-            input_patches=input_patches,
-            reference_patches=reference_patches,
+        self.trained_model = self.correction_model.fit(
+            x_patches=input_patches,
+            y_patches=reference_patches,
         )
-        return self.correction_weights
+        return self.trained_model
 
     def correct_image(self, input_image: ImageType) -> ImageType:
         """Apply color correction to input image.
@@ -134,7 +155,7 @@ class ColorCorrection:
         NDArray
             Color corrected image.
         """
-        if self.correction_weights is None:
+        if self.trained_model is None:
             raise RuntimeError("Model must be fitted before correction")
 
         return self.correction_model.compute_correction(
@@ -182,8 +203,12 @@ if __name__ == "__main__":
     filename = os.path.basename(image_path)
     input_image = cv2.imread(image_path)
 
-    cc = ColorCorrection(detection_model="yolov8", correction_model="least_squares")
-    input_patches, input_grid_patches, drawed_debug_preprocess = (
+    cc = ColorCorrection(
+        detection_model="yolov8",
+        # correction_model="polynomial",
+        correction_model="least_squares",
+    )
+    input_patches, input_grid_patches_img, drawed_debug_preprocess = (
         cc.extract_color_patches(
             input_image=input_image,
             debug=True,
@@ -191,14 +216,19 @@ if __name__ == "__main__":
     )
     cc.fit(input_patches=input_patches)
     corrected_image = cc.correct_image(input_image=input_image)
-    corrected_patches = cc.correct_image(input_image=input_grid_patches)
+    corrected_patches = cc.correct_image(input_image=input_grid_patches_img)
 
-    # Display results with 4 grid: 1. Input patches, 2. Reference patches, 3. Corrected patches, 4. Corrected image
+    reff_grid_patches_img = generate_image_patches(cc.reference_color_card)
+    print(
+        reff_grid_patches_img.shape,
+        input_grid_patches_img.shape,
+        corrected_patches.shape,
+    )
     input_vs_output = np.vstack([input_image, corrected_image])
     grid_patches_vs = np.vstack(
         [
-            input_grid_patches,
-            generate_image_patches(cc.reference_color_card),
+            input_grid_patches_img,
+            reff_grid_patches_img,
             corrected_patches,
         ],
     )
@@ -214,8 +244,31 @@ if __name__ == "__main__":
         ls_mean_ref=cc.reference_color_card,
     )
     print(compare_viz.shape)
-    cv2.imwrite("compare_input_vs_output.jpg", compare_viz)
-    cv2.imwrite("cor_compare_input_vs_output.jpg", cor_compare_viz)
-    cv2.imwrite(f"input_vs_output-{filename}.jpg", input_vs_output)
-    cv2.imwrite(f"grid_patches_vs-{filename}.jpg", grid_patches_vs)
-    cv2.imwrite(f"drawed_debug_preprocess-{filename}.jpg", drawed_debug_preprocess)
+
+    # fmt: off
+    os.makedirs("zzz", exist_ok=True)
+    ls_dir = os.listdir("zzz")
+    run_rank = len(ls_dir) + 2
+    folder = f"zzz/{run_rank}-{cc.model_name}"
+    os.makedirs(folder, exist_ok=True)
+    images_coll = [
+        (input_image, "Input Image"),
+        (corrected_image, "corrected_image"),
+        (compare_viz, "compare_viz"),
+        (cor_compare_viz, "cor_compare_viz"),
+        (grid_patches_vs, "grid_patches_vs"),
+        (input_vs_output, "input_vs_output"),
+        (drawed_debug_preprocess, "drawed_debug_preprocess"),
+    ]
+
+    display_image_grid(
+        images=images_coll,
+        grid_size=(len(images_coll)%3, 3),
+        save_path=f"{folder}/001-aa.jpg",
+    )
+    cv2.imwrite(f"{folder}/compare_input_vs_output.jpg", compare_viz)
+    cv2.imwrite(f"{folder}/cor_compare_input_vs_output.jpg", cor_compare_viz)
+    cv2.imwrite(f"{folder}/input_vs_output-{filename}.jpg", input_vs_output)
+    cv2.imwrite(f"{folder}/grid_patches_vs-{filename}.jpg", grid_patches_vs)
+    cv2.imwrite(f"{folder}/drawed_debug_preprocess-{filename}.jpg", drawed_debug_preprocess)
+    # fmt: on

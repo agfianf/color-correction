@@ -1,6 +1,7 @@
 import time
 
 import numpy as np
+from sklearn.linear_model import LinearRegression
 
 from color_correction_asdfghjkl.core.correction.base import BaseComputeCorrection
 from color_correction_asdfghjkl.utils.correction import (
@@ -9,7 +10,7 @@ from color_correction_asdfghjkl.utils.correction import (
 )
 
 
-class LeastSquaresRegression(BaseComputeCorrection):
+class AffineReg(BaseComputeCorrection):
     def __init__(self) -> None:
         self.model = None
 
@@ -19,12 +20,10 @@ class LeastSquaresRegression(BaseComputeCorrection):
         y_patches: np.ndarray,  # reference patches
     ) -> np.ndarray:
         start_time = time.perf_counter()
-
-        self.model = np.linalg.lstsq(
-            a=x_patches,
-            b=y_patches,
-            rcond=None,
-        )[0]  # get only matrix of coefficients
+        x_patches = np.array(x_patches)
+        print("x_patches.shape", x_patches.shape)
+        x_patches = np.hstack([x_patches, np.ones((x_patches.shape[0], 1))])
+        self.model = LinearRegression(fit_intercept=False).fit(x_patches, y_patches)
 
         exc_time = time.perf_counter() - start_time
         print(f"{self.__class__.__name__} Fit: {exc_time} seconds")
@@ -34,9 +33,9 @@ class LeastSquaresRegression(BaseComputeCorrection):
         if self.model is None:
             raise ValueError("Model is not fitted yet. Please call fit() method first.")
 
-        # Input adalah array (N,3) dari nilai warna patches
         org_input_shape = input_image.shape
         input_image = preprocessing_compute(input_image)
-        image = np.dot(input_image, self.model)
+        input_image = np.hstack([input_image, np.ones((input_image.shape[0], 1))])
+        image = self.model.predict(input_image)
         corrected_image = postprocessing_compute(org_input_shape, image)
         return corrected_image
