@@ -14,6 +14,7 @@ dependencies = [
     "pydantic-settings>=2.7.1",
     "shapely>=2.0.6",
     "colour-science>=0.4.6",
+    "scikit-learn>=1.6.1",
 ]
 classifiers = [
     'Programming Language :: Python :: 3 :: Only',
