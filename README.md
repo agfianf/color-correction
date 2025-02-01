@@ -13,20 +13,21 @@ pip install color-correction-asdfghjkl
 ## Usage
 
 ```python
-import cv2
+image_path = "asset/images/cc-1.jpg"
+# image_path = "asset/images/cc-19.png"
+filename = os.path.basename(image_path)
+input_image = cv2.imread(image_path)
 
-from color_correction_asdfghjkl import ColorCorrection
-
-cc = ColorCorrection(
-    detection_model="yolov8",
-    correction_model="least_squares",
-    use_gpu=False,
+cc = ColorCorrection(detection_model="yolov8", correction_model="least_squares")
+input_patches, input_grid_patches, drawed_debug_preprocess = (
+    cc.extract_color_patches(
+        input_image=input_image,
+        debug=True,
+    )
 )
-
-input_image = cv2.imread("cc-19.png")
-cc.fit(input_image=input_image)
+cc.fit(input_patches=input_patches)
 corrected_image = cc.correct_image(input_image=input_image)
-cv2.imwrite("corrected_image.png", corrected_image)
+corrected_patches = cc.correct_image(input_image=input_grid_patches)
 ```
 Sample output:
 ![Sample Output](assets/sample-output-usage.png)
@@ -48,3 +49,4 @@ Sample output:
 - [Automatic color correction with OpenCV and Python (PyImageSearch)](https://pyimagesearch.com/2021/02/15/automatic-color-correction-with-opencv-and-python/)
 - [ONNX-YOLOv8-Object-Detection](https://github.com/ibaiGorordo/ONNX-YOLOv8-Object-Detection)
 - [yolov8-triton](https://github.com/omarabid59/yolov8-triton/tree/main)
+- [Streamlined Data Science Development: Organizing, Developing and Documenting Your Code](https://medium.com/henkel-data-and-analytics/streamlined-data-science-development-organizing-developing-and-documenting-your-code-bfd69e3ef4fb)
