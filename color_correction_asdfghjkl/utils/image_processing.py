@@ -1,3 +1,4 @@
+import cv2
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import numpy as np
@@ -40,8 +41,8 @@ def crop_region_with_margin(
     return image[crop_y1:crop_y2, crop_x1:crop_x2]
 
 
-def calculate_mean_rgb(img: np.ndarray) -> np.ndarray:
-    """Calculate mean RGB values across spatial dimensions.
+def calc_mean_color_patch(img: np.ndarray) -> np.ndarray:
+    """Calculate mean RGB/BGR values across spatial dimensions.
 
     Parameters
     ----------
@@ -141,3 +142,38 @@ def display_image_grid(
 
     plt.close()  # Close the figure to free memory
     return fig
+
+
+def compare_viz_two_patches(
+    ls_mean_ref: list[np.ndarray],
+    ls_mean_in: list[np.ndarray],
+    patch_size: tuple[int, int, int] = (100, 100, 1),
+) -> np.ndarray:
+    ls_stack_h = []
+    ls_stack_v = []
+
+    h = patch_size[0]
+    w = patch_size[1]
+    h_2 = h // 2
+    w_2 = w // 2
+    y1 = h_2 - (h // 4) - 1
+    y2 = h_2 + (h // 4)
+    x1 = w_2 - (w // 4) - 1
+    x2 = w_2 + (w // 4)
+
+    for _idx, (patch_ref, patch_in) in enumerate(
+        zip(ls_mean_ref, ls_mean_in, strict=False),
+        start=1,
+    ):
+        img_patch_ref = np.tile(patch_ref, patch_size)
+        img_patch_in = np.tile(patch_in, (h_2, w_2, 1))
+        img_patch_in = cv2.resize(img_patch_in, (y2 - y1, x2 - x1))
+        img_patch_ref[y1:y2, x1:x2] = img_patch_in
+        ls_stack_h.append(img_patch_ref)
+
+        if _idx % 6 == 0:
+            row = np.hstack(ls_stack_h)
+            ls_stack_v.append(row)
+            ls_stack_h = []
+    image = np.vstack(ls_stack_v).astype(np.uint8)
+    return image
