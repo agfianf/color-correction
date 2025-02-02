@@ -1,7 +1,7 @@
 import time
 
 import numpy as np
-from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
 
@@ -28,8 +28,7 @@ class Polynomial(BaseComputeCorrection):
         degree = kwargs.get("degree", self.degree)
         self.model = make_pipeline(
             PolynomialFeatures(degree),
-            # LinearRegression(),
-            Ridge(alpha=1.0),
+            LinearRegression(),
         ).fit(x_patches, y_patches)
 
         exc_time = time.perf_counter() - start_time
