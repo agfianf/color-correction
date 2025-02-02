@@ -2,8 +2,6 @@ import time
 
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import PolynomialFeatures
 
 from color_correction_asdfghjkl.core.correction.base import BaseComputeCorrection
 from color_correction_asdfghjkl.utils.correction import (
