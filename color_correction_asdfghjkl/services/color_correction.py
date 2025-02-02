@@ -67,6 +67,10 @@ class ColorCorrection:
     def model_name(self) -> str:
         return self.correction_model.__class__.__name__
 
+    @property
+    def img_grid_patches_ref(self) -> np.ndarray:
+        return generate_image_patches(self.reference_color_card)
+
     def _initialize_correction_model(
         self,
         model_name: str,
@@ -227,7 +231,7 @@ if __name__ == "__main__":
     corrected_image = cc.correct_image(input_image=input_image)
     corrected_patches = cc.correct_image(input_image=input_grid_patches_img)
 
-    reff_grid_patches_img = generate_image_patches(cc.reference_color_card)
+    reff_grid_patches_img = cc.img_grid_patches_ref
     print(
         reff_grid_patches_img.shape,
         input_grid_patches_img.shape,
