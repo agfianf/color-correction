@@ -18,5 +18,6 @@ wheels/
 
 *.pyc
 
+tmp/
 zzz/
 color_correction_asdfghjkl/asset/images/
