@@ -122,6 +122,7 @@ def display_image_grid(
             if len(img.shape) == 2:  # Grayscale
                 ax.imshow(img, cmap="gray")
             else:  # RGB/RGBA
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 ax.imshow(img)
         elif isinstance(img, matplotlib.figure.Figure):
             # Convert matplotlib figure to image array

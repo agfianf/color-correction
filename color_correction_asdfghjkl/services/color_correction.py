@@ -53,9 +53,13 @@ class ColorCorrection:
         correction_model: LiteralModelCorrection = "least_squares",
         reference_color_card: str | None = None,
         use_gpu: bool = True,
+        **kwargs: dict,
     ) -> None:
         self.reference_color_card = reference_color_card or reference_color_d50_bgr
-        self.correction_model = self._initialize_correction_model(correction_model)
+        self.correction_model = self._initialize_correction_model(
+            correction_model,
+            **kwargs,
+        )
         self.card_detector = self._initialize_detector(detection_model, use_gpu)
         self.trained_model = None
 
@@ -63,10 +67,14 @@ class ColorCorrection:
     def model_name(self) -> str:
         return self.correction_model.__class__.__name__
 
-    def _initialize_correction_model(self, model_name: str) -> LeastSquaresRegression:
+    def _initialize_correction_model(
+        self,
+        model_name: str,
+        **kwargs: dict,
+    ) -> LeastSquaresRegression:
         d_model_selection = {
             "least_squares": LeastSquaresRegression(),
-            "polynomial": Polynomial(),
+            "polynomial": Polynomial(**kwargs),
             "linear_reg": LinearReg(),
             "affine_reg": AffineReg(),
         }
@@ -198,15 +206,16 @@ class ColorCorrection:
 if __name__ == "__main__":
     import os
 
-    image_path = "asset/images/cc-1.jpg"
-    # image_path = "asset/images/cc-19.png"
+    # image_path = "asset/images/cc-1.jpg"
+    image_path = "asset/images/cc-19.png"
     filename = os.path.basename(image_path)
     input_image = cv2.imread(image_path)
 
     cc = ColorCorrection(
         detection_model="yolov8",
-        # correction_model="polynomial",
-        correction_model="least_squares",
+        correction_model="polynomial",
+        degree=4,
+        # correction_model="least_squares",
     )
     input_patches, input_grid_patches_img, drawed_debug_preprocess = (
         cc.extract_color_patches(
@@ -245,30 +254,27 @@ if __name__ == "__main__":
     )
     print(compare_viz.shape)
 
-    # fmt: off
     os.makedirs("zzz", exist_ok=True)
     ls_dir = os.listdir("zzz")
     run_rank = len(ls_dir) + 2
     folder = f"zzz/{run_rank}-{cc.model_name}"
     os.makedirs(folder, exist_ok=True)
+
     images_coll = [
-        (input_image, "Input Image"),
-        (corrected_image, "corrected_image"),
-        (compare_viz, "compare_viz"),
-        (cor_compare_viz, "cor_compare_viz"),
-        (grid_patches_vs, "grid_patches_vs"),
-        (input_vs_output, "input_vs_output"),
-        (drawed_debug_preprocess, "drawed_debug_preprocess"),
+        ("input_image", input_image),
+        ("corrected_image", corrected_image),
+        ("drawed_debug_preprocess", drawed_debug_preprocess),
+        ("Reff (inside: input)", compare_viz),
+        ("Reff (inside: corrected)", cor_compare_viz),
+        ("None", None),
+        ("patch_input", input_grid_patches_img),
+        ("patch_corrected", corrected_patches),
+        ("patch_reff", reff_grid_patches_img),
     ]
 
     display_image_grid(
         images=images_coll,
-        grid_size=(len(images_coll)%3, 3),
-        save_path=f"{folder}/001-aa.jpg",
+        grid_size=((len(images_coll) // 3) + 1, 3),
+        figsize=(15, ((len(images_coll) // 3) + 1) * 4),
+        save_path=f"{folder}/00-summary.jpg",
     )
-    cv2.imwrite(f"{folder}/compare_input_vs_output.jpg", compare_viz)
-    cv2.imwrite(f"{folder}/cor_compare_input_vs_output.jpg", cor_compare_viz)
-    cv2.imwrite(f"{folder}/input_vs_output-{filename}.jpg", input_vs_output)
-    cv2.imwrite(f"{folder}/grid_patches_vs-{filename}.jpg", grid_patches_vs)
-    cv2.imwrite(f"{folder}/drawed_debug_preprocess-{filename}.jpg", drawed_debug_preprocess)
-    # fmt: on
