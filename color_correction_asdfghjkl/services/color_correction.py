@@ -407,3 +407,29 @@ class ColorCorrection:
             float(np.mean(delta_e)),
             float(np.std(delta_e)),
         )
+
+
+if __name__ == "__main__":
+    # Step 1: Define the path to the input image
+    image_path = "asset/images/cc-19.png"
+
+    # Step 2: Load the input image
+    input_image = cv2.imread(image_path)
+
+    # Step 3: Initialize the color correction model with specified parameters
+    color_corrector = ColorCorrection(
+        detection_model="yolov8",
+        detection_conf_th=0.25,
+        correction_model="least_squares",
+        degree=2,  # for polynomial correction model
+        use_gpu=True,
+    )
+
+    # Step 4: Extract color patches from the input image
+    color_corrector.set_input_patches(image=input_image, debug=True)
+    color_corrector.fit()
+    corrected_image = color_corrector.predict(
+        input_image=input_image,
+        debug=True,
+        debug_output_dir="zzz",
+    )
