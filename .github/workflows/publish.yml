@@ -23,9 +23,6 @@ jobs:
       - name: Extract version from Git tag
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
-
-      # - name: Install the project
-      #   run: uv sync --all-groups --no-group dev-model
     
       - name: Clear directory
         run: rm -rf dist

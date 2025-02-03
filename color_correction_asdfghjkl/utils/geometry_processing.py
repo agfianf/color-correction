@@ -50,10 +50,10 @@ def generate_expected_patches(card_box: box_tuple) -> list[box_tuple]:
     expected_patches = []
     for row in range(4):
         for col in range(6):
-            x1 = card_x1 + col * patch_width
-            y1 = card_y1 + row * patch_height
-            x2 = x1 + patch_width
-            y2 = y1 + patch_height
+            x1 = int(card_x1 + col * patch_width)
+            y1 = int(card_y1 + row * patch_height)
+            x2 = int(x1 + patch_width)
+            y2 = int(y1 + patch_height)
             expected_patches.append((x1, y1, x2, y2))
 
     return expected_patches
@@ -62,7 +62,7 @@ def generate_expected_patches(card_box: box_tuple) -> list[box_tuple]:
 def extract_intersecting_patches(
     ls_patches: list[box_tuple],
     ls_grid_card: list[box_tuple],
-) -> list[box_tuple]:
+) -> list[tuple[box_tuple, tuple[int, int]]]:
     ls_ordered_patch = []
     for _, grid_card in enumerate(ls_grid_card, start=1):
         # get intesect patch
@@ -81,7 +81,8 @@ def extract_intersecting_patches(
             )
             # intersect_box = ls_intersect[max_id]
             val = box_to_xyxy(intersect_box)
-            ls_ordered_patch.append(val)
+            xy = box_centroid_xy(intersect_box)
+            ls_ordered_patch.append((val, xy))
         else:
             ls_ordered_patch.append(None)
     return ls_ordered_patch
@@ -119,7 +120,6 @@ def calculate_patch_statistics(ls_ordered_patch: list[box_tuple]) -> tuple:
     mean_w = np.mean(ls_w_grid)
     mean_h = np.mean(ls_h_grid)
 
-    print(ls_dx, mean_dx)
     return mean_dx, mean_dy, mean_w, mean_h
 
 

@@ -77,7 +77,7 @@ def downloader_model_yolov8(use_gpu: bool = False) -> str:
     fullpath = os.path.join(model_folder, filename)
     if os.path.exists(fullpath):
         return fullpath
-
+    print("Auto downloading YOLOv8 model...")
     download_google_drive_file(fileid, fullpath)
     return fullpath
 

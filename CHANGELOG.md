@@ -1,5 +1,45 @@
 # Changelog
 
+## [v0.0.1b0] - 2025-02-03
+
+### 🔧 Improvements
+- **Color Correction Core**
+  - Added new correction models: polynomial, linear regression, and affine regression
+  - Improved patch detection and processing pipeline
+  - Added support for debug visualization outputs
+  - Enhanced color patch extraction with better error handling
+
+### 🎨 Features
+- **Reference Colors**
+  - Added RGB format reference colors alongside BGR
+  - Improved color patch visualization and comparison tools
+  - Added support for custom reference images
+
+### 📝 Documentation
+- **README Updates**
+  - Simplified usage documentation with clearer examples
+  - Added visual explanation of color correction workflow
+  - Updated installation and usage instructions
+
+### 🛠️ Development
+- **Project Structure**
+  - Reorganized core modules for better maintainability
+  - Added new utility modules for image processing
+  - Updated VSCode settings for better development experience
+
+### 🔨 Build
+- **Dependencies**
+  - Added scikit-learn for advanced correction models
+  - Updated ruff to v0.9.4
+  - Added pre-commit hooks configuration
+
+### 🧪 Testing
+- **Test Coverage**
+  - Added new test cases for image processing utilities
+  - Improved test organization and structure
+
+
+
 ## [v0.0.1a2] - 2025-01-27
 
 ### 🚀 New Features

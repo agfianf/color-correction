@@ -1,16 +1,18 @@
 __version__ = "0.0.1a1"
 
 # fmt: off
-from .constant.color_checker import reference_color_d50 as REFERENCE_COLOR_D50  # noqa: N812, I001
-from .core.card_detection.yolov8_det_onnx import YOLOv8CardDetector
-from .schemas.yolov8_det import DetectionResult as YOLOv8DetectionResult
+from .constant.color_checker import reference_color_d50_bgr as REFERENCE_COLOR_D50_BGR  # noqa: N812, I001
+from .constant.color_checker import reference_color_d50_rgb as REFERENCE_COLOR_D50_RGB  # noqa: N812, I001
+from .core.card_detection.det_yv8_onnx import YOLOv8CardDetector
+from .schemas.det_yv8 import DetectionResult as YOLOv8DetectionResult
 from .services.color_correction import ColorCorrection
 
 # fmt: on
 
 __all__ = [
     "__version__",
-    "REFERENCE_COLOR_D50",
+    "REFERENCE_COLOR_D50_BGR",
+    "REFERENCE_COLOR_D50_RGB",
     "ColorCorrection",
     "YOLOv8CardDetector",
     "YOLOv8DetectionResult",

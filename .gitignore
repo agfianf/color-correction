@@ -17,3 +17,7 @@ wheels/
 .ruff_cache/
 
 *.pyc
+
+tmp/
+zzz/
+color_correction_asdfghjkl/asset/images/

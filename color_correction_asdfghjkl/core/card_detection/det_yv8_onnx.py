@@ -5,7 +5,7 @@ import numpy as np
 import onnxruntime
 
 from color_correction_asdfghjkl.core.card_detection.base import BaseCardDetector
-from color_correction_asdfghjkl.schemas.yolov8_det import DetectionResult
+from color_correction_asdfghjkl.schemas.det_yv8 import DetectionResult
 from color_correction_asdfghjkl.utils.downloader import downloader_model_yolov8
 from color_correction_asdfghjkl.utils.yolo_utils import (
     multiclass_nms,
@@ -34,7 +34,6 @@ class YOLOv8CardDetector(BaseCardDetector):
         self.iou_threshold = iou_th
         self.use_gpu = use_gpu
         if path is None:
-            print("Auto downloading YOLOv8 model...")
             path = downloader_model_yolov8(use_gpu)
         self.__initialize_model(path)
 
@@ -53,7 +52,7 @@ class YOLOv8CardDetector(BaseCardDetector):
             A dataclass containing detected bounding boxes, confidence scores,
             and class IDs.
         """
-        input_tensor = self.__prepare_input(image)
+        input_tensor = self.__prepare_input(image.copy())
         outputs = self.__inference(input_tensor)
         boxes, scores, class_ids = self.__process_output(outputs)
 
