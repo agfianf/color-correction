@@ -121,7 +121,7 @@ wheels = [
 
 [[package]]
 name = "color-correction-asdfghjkl"
-version = "0.0.1a2"
+version = "0.0.1b0"
 source = { editable = "." }
 dependencies = [
     { name = "colour-science" },
