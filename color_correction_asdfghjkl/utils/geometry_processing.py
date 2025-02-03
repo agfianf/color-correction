@@ -120,7 +120,6 @@ def calculate_patch_statistics(ls_ordered_patch: list[box_tuple]) -> tuple:
     mean_w = np.mean(ls_w_grid)
     mean_h = np.mean(ls_h_grid)
 
-    print(ls_dx, mean_dx)
     return mean_dx, mean_dy, mean_w, mean_h
 
 
@@ -129,7 +128,6 @@ def suggest_missing_patch_coordinates(  # noqa: C901
 ) -> dict[int, box_tuple]:
     d_suggest = {}
 
-    print("ls_ordered_patch", ls_ordered_patch)
     mean_dx, mean_dy, mean_w, mean_h = calculate_patch_statistics(
         ls_ordered_patch=ls_ordered_patch,
     )

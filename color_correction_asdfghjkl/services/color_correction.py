@@ -152,11 +152,14 @@ class ColorCorrection:
             - Debug visualization (if debug=True)
         """
         prediction = self.card_detector.detect(image=image)
-        return DetectionProcessor.extract_color_patches(
-            input_image=image,
-            prediction=prediction,
-            draw_processed_image=debug,
+        ls_bgr_mean_patch, grid_patch_img, debug_detection_viz = (
+            DetectionProcessor.extract_color_patches(
+                input_image=image,
+                prediction=prediction,
+                draw_processed_image=debug,
+            )
         )
+        return ls_bgr_mean_patch, grid_patch_img, debug_detection_viz
 
     def _save_debug_output(
         self,

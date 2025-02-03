@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 
 
@@ -6,17 +5,17 @@ def create_patch_tiled_image(
     ls_patches: list[tuple[int, int, int, int]],
     patch_size: tuple[int, int, int] = (50, 50, 1),
 ) -> np.ndarray:
-    """Generate a color patch image from a list of RGB values.
+    """Generate a color patch image from a list of BGR values.
 
-    This function creates a color patch image by tiling RGB values into patches and
+    This function creates a color patch image by tiling BGR values into patches and
     arranging them in a 4x6 grid pattern. Each patch is repeated according to the
     specified patch size.
 
     Parameters
     ----------
     ls_patches : list of tuple
-        List containing 24 RGB color tuples, where each tuple has three integers
-        representing (R, G, B) values.
+        List containing 24 BGR color tuples, where each tuple has three integers
+        representing (B, G, R) values.
     patch_size : tuple of int, optional
         Size of each individual patch in pixels, by default (50, 50, 1).
         Format is (height, width, channels).
@@ -34,13 +33,16 @@ def create_patch_tiled_image(
 
     Examples
     --------
-    >>> patches = [(255, 0, 0), (0, 255, 0), ...] # 24 RGB tuples
+    >>> patches = [(255, 0, 0), (0, 255, 0), ...] # 24 BGR tuples
     >>> patch_size = (50, 50, 1)
     >>> image = generate_image_patches(patches, patch_size)
     """
 
     ls_stack_h = []
     ls_stack_v = []
+
+    if len(ls_patches) != 24:
+        raise ValueError("Failed to generate image. The number of patches must be 24.")
 
     for _idx, patch in enumerate(ls_patches, start=1):
         patch_img = np.tile(patch, patch_size)
@@ -54,8 +56,8 @@ def create_patch_tiled_image(
 
 
 def visualize_patch_comparison(
-    ls_mean_ref: list[np.ndarray],
-    ls_mean_in: list[np.ndarray],
+    ls_mean_ref: np.ndarray,
+    ls_mean_in: np.ndarray,
     patch_size: tuple[int, int, int] = (100, 100, 1),
 ) -> np.ndarray:
     """
@@ -81,6 +83,7 @@ def visualize_patch_comparison(
         The final composited image with each outer patch modified with the
         corresponding resized inner patch, arranged in a grid format.
     """
+
     ls_stack_h = []
     ls_stack_v = []
 
@@ -98,8 +101,12 @@ def visualize_patch_comparison(
         start=1,
     ):
         img_patch_ref = np.tile(patch_ref, patch_size)
-        img_patch_in = np.tile(patch_in, (h_2, w_2, 1))
-        img_patch_in = cv2.resize(img_patch_in, (y2 - y1, x2 - x1))
+        img_patch_in = np.tile(
+            patch_in,
+            (y2 - y1, x2 - x1, patch_size[2]),
+        )
+
+        # img_patch_in = cv2.resize(img_patch_in, (y2 - y1, x2 - x1))
         img_patch_ref[y1:y2, x1:x2] = img_patch_in
         ls_stack_h.append(img_patch_ref)
 

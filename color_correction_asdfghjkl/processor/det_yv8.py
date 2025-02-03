@@ -291,7 +291,6 @@ class DetectionProcessor:
             )
 
         # Draw suggested patches if provided
-        print(f"Suggested: {suggested_patches}")
         if suggested_patches:
             for box in suggested_patches.values():
                 cv2.rectangle(
