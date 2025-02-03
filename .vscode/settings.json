@@ -6,7 +6,7 @@
         "--config=${workspaceFolder}/pyproject.toml"
     ],
     "python.testing.pytestArgs": [
-        "tests -v"
+        "tests -sv"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
