@@ -5,8 +5,8 @@ from color_correction_asdfghjkl.utils.image_processing import crop_region_with_m
 @pytest.fixture
 def known_image() -> np.ndarray:
     # Create an image with a known pattern using np.arange,
-    # reshape to (100, 100, 3) and wrap values with modulo 256.
-    img = np.arange(100 * 100 * 3, dtype=np.uint8) % 256
+    # reshape to (100, 100, 3) and wrap values with modulo 255
+    img = np.arange(100 * 100 * 3, dtype=np.uint8) % 255
     return img.reshape((100, 100, 3))
 
 @pytest.mark.parametrize(
