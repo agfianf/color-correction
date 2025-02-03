@@ -1,5 +1,5 @@
 
-# 🎨 Color Correction 
+# 🎨 Color Correction
 
 > **Note:** The "asdfghjkl" is just a placeholder due to some naming difficulties.
 
@@ -13,21 +13,32 @@ pip install color-correction-asdfghjkl
 ## Usage
 
 ```python
-image_path = "asset/images/cc-1.jpg"
-# image_path = "asset/images/cc-19.png"
-filename = os.path.basename(image_path)
+import os
+
+# Step 1: Define the path to the input image
+image_path = "asset/images/cc-19.png"
+
+# Step 2: Load the input image
 input_image = cv2.imread(image_path)
 
-cc = ColorCorrection(detection_model="yolov8", correction_model="least_squares")
-input_patches, input_grid_patches, drawed_debug_preprocess = (
-    cc.extract_color_patches(
-        input_image=input_image,
-        debug=True,
-    )
+# Step 3: Initialize the color correction model with specified parameters
+color_corrector = ColorCorrection(
+    detection_model="yolov8",
+    detection_conf_th=0.25,
+    correction_model="least_squares",
+    degree=2, # for polynomial correction model
+    use_gpu=True,
 )
-cc.fit(input_patches=input_patches)
-corrected_image = cc.correct_image(input_image=input_image)
-corrected_patches = cc.correct_image(input_image=input_grid_patches)
+
+# Step 4: Extract color patches from the input image
+color_corrector.set_input_patches(image=input_image, debug=True)
+color_corrector.fit()
+corrected_image = color_corrector.predict(
+    input_image=input_image,
+    debug=True,
+    debug_output_dir="zzz",
+)
+
 ```
 Sample output:
 ![Sample Output](assets/sample-output-usage.png)
