@@ -10,17 +10,14 @@ from color_correction_asdfghjkl.constant.color_checker import reference_color_d5
 from color_correction_asdfghjkl.core.card_detection.det_yv8_onnx import (
     YOLOv8CardDetector,
 )
-from color_correction_asdfghjkl.core.correction import (
-    AffineReg,
-    LeastSquaresRegression,
-    LinearReg,
-    Polynomial,
-)
+from color_correction_asdfghjkl.core.correction import CorrectionModelFactory
 from color_correction_asdfghjkl.processor.det_yv8 import DetectionProcessor
-from color_correction_asdfghjkl.utils.image_processing import (
-    compare_viz_two_patches,
-    display_image_grid,
-    generate_image_patches,
+from color_correction_asdfghjkl.utils.image_patch import (
+    create_patch_tiled_image,
+    visualize_patch_comparison,
+)
+from color_correction_asdfghjkl.utils.visualization_utils import (
+    create_image_grid_visualization,
 )
 
 ColorPatchType = NDArray[np.uint8]
@@ -89,8 +86,8 @@ class ColorCorrection:
 
         # Initialize model attributes
         self.trained_model = None
-        self.correction_model = self._create_correction_model(
-            correction_model,
+        self.correction_model = CorrectionModelFactory.create(
+            model_name=correction_model,
             **kwargs,
         )
         self.card_detector = self._create_detector(
@@ -101,40 +98,6 @@ class ColorCorrection:
 
         # Set reference patches
         self.set_reference_patches(image=reference_image)
-
-    def _create_correction_model(
-        self,
-        model_name: str,
-        **kwargs: dict,
-    ) -> LeastSquaresRegression:
-        """Create a color correction model instance.
-
-        Parameters
-        ----------
-        model_name : str
-            Name of the correction model to create.
-        **kwargs : dict
-            Additional parameters for model initialization.
-
-        Returns
-        -------
-        LeastSquaresRegression
-            Initialized correction model instance.
-
-        Raises
-        ------
-        ValueError
-            If the model name is not supported.
-        """
-        model_registry = {
-            "least_squares": LeastSquaresRegression(),
-            "polynomial": Polynomial(**kwargs),
-            "linear_reg": LinearReg(),
-            "affine_reg": AffineReg(),
-        }
-        if model_name not in model_registry:
-            raise ValueError(f"Unsupported correction model: {model_name}")
-        return model_registry[model_name]
 
     def _create_detector(
         self,
@@ -215,13 +178,13 @@ class ColorCorrection:
         predicted_patches = self.correction_model.compute_correction(
             input_image=np.array(self.input_patches),
         )
-        predicted_grid = generate_image_patches(predicted_patches)
+        predicted_grid = create_patch_tiled_image(predicted_patches)
 
-        before_comparison = compare_viz_two_patches(
+        before_comparison = visualize_patch_comparison(
             ls_mean_in=self.input_patches,
             ls_mean_ref=self.reference_patches,
         )
-        after_comparison = compare_viz_two_patches(
+        after_comparison = visualize_patch_comparison(
             ls_mean_in=predicted_patches,
             ls_mean_ref=self.reference_patches,
         )
@@ -236,7 +199,7 @@ class ColorCorrection:
             ("Debug Preprocess", self.input_debug_image),
             ("Reference vs Input", before_comparison),
             ("Reference vs Corrected", after_comparison),
-            ("(None Space)", None),
+            ("[Free Space]", None),
             ("Patch Input", self.input_grid_image),
             ("Patch Corrected", predicted_grid),
             ("Patch Reference", self.reference_grid_image),
@@ -244,7 +207,7 @@ class ColorCorrection:
 
         # Save debug grid
         save_path = os.path.join(run_dir, "debug.jpg")
-        display_image_grid(
+        create_image_grid_visualization(
             images=image_collection,
             grid_size=((len(image_collection) // 3) + 1, 3),
             figsize=(15, ((len(image_collection) // 3) + 1) * 4),
@@ -277,7 +240,7 @@ class ColorCorrection:
 
     @property
     def img_grid_patches_ref(self) -> np.ndarray:
-        return generate_image_patches(self.reference_color_card)
+        return create_patch_tiled_image(self.reference_color_card)
 
     def set_reference_patches(
         self,
@@ -286,7 +249,7 @@ class ColorCorrection:
     ) -> None:
         if image is None:
             self.reference_patches = reference_color_d50_bgr
-            self.reference_grid_image = generate_image_patches(self.reference_patches)
+            self.reference_grid_image = create_patch_tiled_image(self.reference_patches)
         else:
             (
                 self.reference_patches,
