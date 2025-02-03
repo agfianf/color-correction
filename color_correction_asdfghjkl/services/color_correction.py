@@ -1,3 +1,4 @@
+import os
 from typing import Literal
 
 import colour as cl
@@ -35,33 +36,240 @@ LiteralModelCorrection = Literal[
 class ColorCorrection:
     """Color correction handler using color card detection and correction models.
 
+    This class handles the complete workflow of color correction, including:
+    - Color card detection in images
+    - Color patch extraction
+    - Color correction model training
+    - Image correction application
+
     Parameters
     ----------
     detection_model : {'yolov8'}
         The model to use for color card detection.
-    correction_model : {'least_squares'}
+    detection_conf_th : float, optional
+        Confidence threshold for card detection.
+    correction_model : {'least_squares', 'polynomial', 'linear_reg', 'affine_reg'}
         The model to use for color correction.
-    reference_color_card : str, optional
-        Path to the reference color card image.
+    reference_image : NDArray[np.uint8] | None, optional
+        Reference image containing color checker card.
+        If None, uses standard D50 values.
     use_gpu : bool, default=True
         Whether to use GPU for card detection.
+    **kwargs : dict
+        Additional parameters for the correction model.
+
+    Attributes
+    ----------
+    reference_patches : List[ColorPatchType] | None
+        Extracted color patches from reference image.
+    reference_grid_image : ImageType | None
+        Visualization of reference color patches in grid format.
+    reference_debug_image : ImageType | None
+        Debug visualization of reference image preprocessing.
     """
 
     def __init__(
         self,
         detection_model: Literal["yolov8"] = "yolov8",
+        detection_conf_th: float = 0.25,
         correction_model: LiteralModelCorrection = "least_squares",
-        reference_color_card: str | None = None,
+        reference_image: ImageType | None = None,
         use_gpu: bool = True,
         **kwargs: dict,
     ) -> None:
-        self.reference_color_card = reference_color_card or reference_color_d50_bgr
-        self.correction_model = self._initialize_correction_model(
+        # Initialize reference image attributes
+        self.reference_patches = None
+        self.reference_grid_image = None
+        self.reference_debug_image = None
+
+        # Initialize input image attributes
+        self.input_patches = None
+        self.input_grid_image = None
+        self.input_debug_image = None
+
+        # Initialize model attributes
+        self.trained_model = None
+        self.correction_model = self._create_correction_model(
             correction_model,
             **kwargs,
         )
-        self.card_detector = self._initialize_detector(detection_model, use_gpu)
-        self.trained_model = None
+        self.card_detector = self._create_detector(
+            model_name=detection_model,
+            conf_th=detection_conf_th,
+            use_gpu=use_gpu,
+        )
+
+        # Set reference patches
+        self.set_reference_patches(image=reference_image)
+
+    def _create_correction_model(
+        self,
+        model_name: str,
+        **kwargs: dict,
+    ) -> LeastSquaresRegression:
+        """Create a color correction model instance.
+
+        Parameters
+        ----------
+        model_name : str
+            Name of the correction model to create.
+        **kwargs : dict
+            Additional parameters for model initialization.
+
+        Returns
+        -------
+        LeastSquaresRegression
+            Initialized correction model instance.
+
+        Raises
+        ------
+        ValueError
+            If the model name is not supported.
+        """
+        model_registry = {
+            "least_squares": LeastSquaresRegression(),
+            "polynomial": Polynomial(**kwargs),
+            "linear_reg": LinearReg(),
+            "affine_reg": AffineReg(),
+        }
+        if model_name not in model_registry:
+            raise ValueError(f"Unsupported correction model: {model_name}")
+        return model_registry[model_name]
+
+    def _create_detector(
+        self,
+        model_name: str,
+        conf_th: float = 0.25,
+        use_gpu: bool = False,
+    ) -> YOLOv8CardDetector:
+        """Create a card detector instance.
+
+        Parameters
+        ----------
+        model_name : str
+            Name of the detector model to create.
+        conf_th : float, optional
+            Confidence threshold for card detection. Default is 0.25.
+        use_gpu : bool, optional
+            Whether to use GPU for detection. Default is False.
+
+        Returns
+        -------
+        YOLOv8CardDetector
+            Initialized detector instance.
+
+        Raises
+        ------
+        ValueError
+            If the model name is not supported.
+        """
+        if model_name != "yolov8":
+            raise ValueError(f"Unsupported detection model: {model_name}")
+        return YOLOv8CardDetector(use_gpu=use_gpu, conf_th=conf_th)
+
+    def _extract_color_patches(
+        self,
+        image: ImageType,
+        debug: bool = False,
+    ) -> tuple[list[ColorPatchType], ImageType, ImageType | None]:
+        """Extract color patches from an image using card detection.
+
+        Parameters
+        ----------
+        image : ImageType
+            Input image in BGR format.
+        debug : bool, optional
+            Whether to generate debug visualizations.
+
+        Returns
+        -------
+        tuple[list[ColorPatchType], ImageType, ImageType | None]
+            - List of BGR mean values for each detected patch
+            - Grid visualization of detected patches
+            - Debug visualization (if debug=True)
+        """
+        prediction = self.card_detector.detect(image=image)
+        return DetectionProcessor.extract_color_patches(
+            input_image=image,
+            prediction=prediction,
+            draw_processed_image=debug,
+        )
+
+    def _save_debug_output(
+        self,
+        input_image: ImageType,
+        corrected_image: ImageType,
+        output_directory: str,
+    ) -> None:
+        """Save debug visualizations to disk.
+
+        Parameters
+        ----------
+        input_image : ImageType
+            The input image.
+        corrected_image : ImageType
+            The color-corrected image.
+        output_directory : str
+            Directory to save debug outputs.
+        """
+        predicted_patches = self.correction_model.compute_correction(
+            input_image=np.array(self.input_patches),
+        )
+        predicted_grid = generate_image_patches(predicted_patches)
+
+        before_comparison = compare_viz_two_patches(
+            ls_mean_in=self.input_patches,
+            ls_mean_ref=self.reference_patches,
+        )
+        after_comparison = compare_viz_two_patches(
+            ls_mean_in=predicted_patches,
+            ls_mean_ref=self.reference_patches,
+        )
+
+        # Create output directories
+        run_dir = self._create_debug_directory(output_directory)
+
+        # Prepare debug image grid
+        image_collection = [
+            ("Input Image", input_image),
+            ("Corrected Image", corrected_image),
+            ("Debug Preprocess", self.input_debug_image),
+            ("Reference vs Input", before_comparison),
+            ("Reference vs Corrected", after_comparison),
+            ("(None Space)", None),
+            ("Patch Input", self.input_grid_image),
+            ("Patch Corrected", predicted_grid),
+            ("Patch Reference", self.reference_grid_image),
+        ]
+
+        # Save debug grid
+        save_path = os.path.join(run_dir, "debug.jpg")
+        display_image_grid(
+            images=image_collection,
+            grid_size=((len(image_collection) // 3) + 1, 3),
+            figsize=(15, ((len(image_collection) // 3) + 1) * 4),
+            save_path=save_path,
+        )
+        print(f"Debug output saved to: {save_path}")
+
+    def _create_debug_directory(self, base_dir: str) -> str:
+        """Create and return a unique debug output directory.
+
+        Parameters
+        ----------
+        base_dir : str
+            Base directory for debug outputs.
+
+        Returns
+        -------
+        str
+            Path to the created directory.
+        """
+        os.makedirs(base_dir, exist_ok=True)
+        run_number = len(os.listdir(base_dir)) + 1
+        run_dir = os.path.join(base_dir, f"{run_number}-{self.model_name}")
+        os.makedirs(run_dir, exist_ok=True)
+        return run_dir
 
     @property
     def model_name(self) -> str:
@@ -71,66 +279,33 @@ class ColorCorrection:
     def img_grid_patches_ref(self) -> np.ndarray:
         return generate_image_patches(self.reference_color_card)
 
-    def _initialize_correction_model(
+    def set_reference_patches(
         self,
-        model_name: str,
-        **kwargs: dict,
-    ) -> LeastSquaresRegression:
-        d_model_selection = {
-            "least_squares": LeastSquaresRegression(),
-            "polynomial": Polynomial(**kwargs),
-            "linear_reg": LinearReg(),
-            "affine_reg": AffineReg(),
-        }
-        selected_model = d_model_selection.get(model_name)
-        if selected_model:
-            return selected_model
-        raise ValueError(f"Unsupported correction model: {model_name}")
-
-    def _initialize_detector(
-        self,
-        model_name: str,
-        use_gpu: bool,
-    ) -> YOLOv8CardDetector:
-        if model_name == "yolov8":
-            return YOLOv8CardDetector(use_gpu=use_gpu, conf_th=0.25)
-        raise ValueError(f"Unsupported detection model: {model_name}")
-
-    def extract_color_patches(
-        self,
-        input_image: ImageType,
+        image: np.ndarray | None,
         debug: bool = False,
-    ) -> tuple[list[ColorPatchType], ImageType, ImageType | None]:
-        """Extract color patches from input image using card detection.
+    ) -> None:
+        if image is None:
+            self.reference_patches = reference_color_d50_bgr
+            self.reference_grid_image = generate_image_patches(self.reference_patches)
+        else:
+            (
+                self.reference_patches,
+                self.reference_grid_image,
+                self.reference_debug_image,
+            ) = self._extract_color_patches(image=image, debug=debug)
 
-        Parameters
-        ----------
-        input_image : NDArray[np.uint8]
-            Input image BGR from which to extract color patches.
+    def set_input_patches(self, image: np.ndarray, debug: bool = False) -> None:
+        self.input_patches = None
+        self.input_grid_image = None
+        self.input_debug_image = None
 
-        Returns
-        -------
-        Tuple[List[NDArray], NDArray, NDArray]
-            - List of BGR mean values for each detected patch.
-            Each element is an array of shape (3,) containing [B, G, R] values.
-            - Visualization of detected patches.
-            - Visualization of preprocessing card detection.
-        """
-        prediction = self.card_detector.detect(image=input_image)
-        input_patches, patch_viz, debug_detection_viz = (
-            DetectionProcessor.extract_color_patches(
-                input_image=input_image,
-                prediction=prediction,
-                draw_processed_image=debug,
-            )
-        )
-        return input_patches, patch_viz, debug_detection_viz
+        (
+            self.input_patches,
+            self.input_grid_image,
+            self.input_debug_image,
+        ) = self._extract_color_patches(image=image, debug=debug)
 
-    def fit(
-        self,
-        input_patches: list[ColorPatchType],
-        reference_patches: list[ColorPatchType] | None = None,
-    ) -> tuple[NDArray, list[ColorPatchType], list[ColorPatchType]]:
+    def fit(self) -> tuple[NDArray, list[ColorPatchType], list[ColorPatchType]]:
         """Fit color correction model using input and reference images.
 
         Parameters
@@ -145,34 +320,61 @@ class ColorCorrection:
         Tuple[NDArray, List[NDArray], List[NDArray]]
             Correction weights, input patches, and reference patches.
         """
-        if reference_patches is None:
-            reference_patches = self.reference_color_card
+        if self.reference_patches is None:
+            raise RuntimeError("Reference patches must be set before fitting model")
+
+        if self.input_patches is None:
+            raise RuntimeError("Input patches must be set before fitting model")
 
         self.trained_model = self.correction_model.fit(
-            x_patches=input_patches,
-            y_patches=reference_patches,
+            x_patches=self.input_patches,
+            y_patches=self.reference_patches,
         )
+
         return self.trained_model
 
-    def correct_image(self, input_image: ImageType) -> ImageType:
+    def predict(
+        self,
+        input_image: ImageType,
+        debug: bool = False,
+        debug_output_dir: str = "output-debug",
+    ) -> ImageType:
         """Apply color correction to input image.
 
         Parameters
         ----------
-        input_image : NDArray
+        input_image : ImageType
             Image to be color corrected.
+        debug : bool, optional
+            Whether to save debug visualizations.
+        debug_output_dir : str, optional
+            Directory to save debug outputs.
 
         Returns
         -------
-        NDArray
+        ImageType
             Color corrected image.
+
+        Raises
+        ------
+        RuntimeError
+            If model has not been fitted.
         """
         if self.trained_model is None:
             raise RuntimeError("Model must be fitted before correction")
 
-        return self.correction_model.compute_correction(
+        corrected_image = self.correction_model.compute_correction(
             input_image=input_image.copy(),
         )
+
+        if debug:
+            self._save_debug_output(
+                input_image=input_image,
+                corrected_image=corrected_image,
+                output_directory=debug_output_dir,
+            )
+
+        return corrected_image
 
     def calc_color_diff(
         self,
@@ -205,80 +407,3 @@ class ColorCorrection:
             float(np.mean(delta_e)),
             float(np.std(delta_e)),
         )
-
-
-if __name__ == "__main__":
-    import os
-
-    # image_path = "asset/images/cc-1.jpg"
-    image_path = "asset/images/cc-19.png"
-    filename = os.path.basename(image_path)
-    input_image = cv2.imread(image_path)
-
-    cc = ColorCorrection(
-        detection_model="yolov8",
-        correction_model="polynomial",
-        degree=4,
-        # correction_model="least_squares",
-    )
-    input_patches, input_grid_patches_img, drawed_debug_preprocess = (
-        cc.extract_color_patches(
-            input_image=input_image,
-            debug=True,
-        )
-    )
-    cc.fit(input_patches=input_patches)
-    corrected_image = cc.correct_image(input_image=input_image)
-    corrected_patches = cc.correct_image(input_image=input_grid_patches_img)
-
-    reff_grid_patches_img = cc.img_grid_patches_ref
-    print(
-        reff_grid_patches_img.shape,
-        input_grid_patches_img.shape,
-        corrected_patches.shape,
-    )
-    input_vs_output = np.vstack([input_image, corrected_image])
-    grid_patches_vs = np.vstack(
-        [
-            input_grid_patches_img,
-            reff_grid_patches_img,
-            corrected_patches,
-        ],
-    )
-    compare_viz = compare_viz_two_patches(
-        ls_mean_in=input_patches,
-        ls_mean_ref=cc.reference_color_card,
-    )
-    print(np.array(input_patches).shape, np.array(input_patches))
-    output_patches = cc.correct_image(input_image=np.array(input_patches))
-
-    cor_compare_viz = compare_viz_two_patches(
-        ls_mean_in=output_patches,
-        ls_mean_ref=cc.reference_color_card,
-    )
-    print(compare_viz.shape)
-
-    os.makedirs("zzz", exist_ok=True)
-    ls_dir = os.listdir("zzz")
-    run_rank = len(ls_dir) + 2
-    folder = f"zzz/{run_rank}-{cc.model_name}"
-    os.makedirs(folder, exist_ok=True)
-
-    images_coll = [
-        ("input_image", input_image),
-        ("corrected_image", corrected_image),
-        ("drawed_debug_preprocess", drawed_debug_preprocess),
-        ("Reff (inside: input)", compare_viz),
-        ("Reff (inside: corrected)", cor_compare_viz),
-        ("None", None),
-        ("patch_input", input_grid_patches_img),
-        ("patch_corrected", corrected_patches),
-        ("patch_reff", reff_grid_patches_img),
-    ]
-
-    display_image_grid(
-        images=images_coll,
-        grid_size=((len(images_coll) // 3) + 1, 3),
-        figsize=(15, ((len(images_coll) // 3) + 1) * 4),
-        save_path=f"{folder}/00-summary.jpg",
-    )
