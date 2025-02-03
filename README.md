@@ -13,8 +13,6 @@ pip install color-correction-asdfghjkl
 ## Usage
 
 ```python
-import os
-
 # Step 1: Define the path to the input image
 image_path = "asset/images/cc-19.png"
 
