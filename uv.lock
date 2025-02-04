@@ -121,11 +121,15 @@ wheels = [
 
 [[package]]
 name = "color-correction-asdfghjkl"
-version = "0.0.1b0"
+version = "0.0.1b1"
 source = { editable = "." }
 dependencies = [
     { name = "colour-science" },
     { name = "httpx" },
+    { name = "matplotlib" },
+    { name = "onnx" },
+    { name = "onnxruntime" },
+    { name = "opencv-python-headless" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "scikit-learn" },
@@ -133,12 +137,6 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
-analyze = [
-    { name = "matplotlib" },
-]
-default = [
-    { name = "opencv-python-headless" },
-]
 dev = [
     { name = "pre-commit" },
     { name = "pytest" },
@@ -151,15 +149,15 @@ dev-model = [
 mccdet = [
     { name = "opencv-contrib-python" },
 ]
-yolodet = [
-    { name = "onnx" },
-    { name = "onnxruntime" },
-]
 
 [package.metadata]
 requires-dist = [
     { name = "colour-science", specifier = ">=0.4.6" },
     { name = "httpx", specifier = ">=0.28.1" },
+    { name = "matplotlib", specifier = ">=3.10.0" },
+    { name = "onnx", specifier = ">=1.17.0" },
+    { name = "onnxruntime", specifier = ">=1.20.1" },
+    { name = "opencv-python-headless", specifier = ">=4.11.0.86" },
     { name = "pydantic", specifier = ">=2.10.5" },
     { name = "pydantic-settings", specifier = ">=2.7.1" },
     { name = "scikit-learn", specifier = ">=1.6.1" },
@@ -167,8 +165,6 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-analyze = [{ name = "matplotlib", specifier = ">=3.10.0" }]
-default = [{ name = "opencv-python-headless", specifier = ">=4.11.0.86" }]
 dev = [
     { name = "pre-commit", specifier = ">=4.1.0" },
     { name = "pytest", specifier = ">=8.3.4" },
@@ -177,10 +173,6 @@ dev = [
 ]
 dev-model = [{ name = "ultralytics", specifier = ">=8.3.65" }]
 mccdet = [{ name = "opencv-contrib-python", specifier = ">=4.11.0.86" }]
-yolodet = [
-    { name = "onnx", specifier = ">=1.17.0" },
-    { name = "onnxruntime", specifier = ">=1.20.1" },
-]
 
 [[package]]
 name = "colorama"

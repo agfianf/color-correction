@@ -9,3 +9,13 @@ yolo-export-onnx:
 
 test:
 	pytest tests -v
+
+
+diff:
+	git diff main..{branch_name} > diff-output.txt
+
+log:
+	git log --oneline main..{branch_name} > log-output.txt
+
+update-uv-lock:
+	uv lock

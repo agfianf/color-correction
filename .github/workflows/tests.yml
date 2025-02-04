@@ -1,4 +1,3 @@
-# .github/workflows/test.yml
 name: Test
 
 on:
@@ -8,9 +7,10 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version:
           - "3.10"
           - "3.11"
@@ -18,23 +18,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install uv and set the python version
         uses: astral-sh/setup-uv@v5
         with:
-          version: "0.5.23"
+          version: "0.5.24"
           enable-cache: true
           cache-dependency-glob: "uv.lock"
           python-version: ${{ matrix.python-version }}
-      
+
       - name: Install the project
         run: uv sync --all-groups --no-group dev-model
 
       - name: Checking linter and formatting
         run: uvx ruff check
 
-      - name: Run tests
-        run: uv run pytest tests -v
-      
-      - name: Test with Coverage
-        run: uv run pytest --cov=src tests/
+      - name: Run tests with Coverage
+        run: |
+          uv run pytest --cov-report=term-missing --cov=color_correction_asdfghjkl tests/
+          uv run coverage report --fail-under=35

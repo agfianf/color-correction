@@ -1,5 +1,27 @@
 # Changelog
 
+## [v0.0.1b1] - 2025-02-03
+**Enhanced Color Correction with Improved Documentation and Evaluation**
+
+### ✨ Features
+- Enhanced color correction with improved patch comparison and metrics
+- Added polynomial correction model with configurable degrees
+- Implemented comprehensive color difference evaluation
+
+### 📚 Documentation
+- Added "How it works" section with visual explanation
+- Updated README with polynomial correction details
+- Improved section headers for better clarity
+- Added sample debug output visualization
+- Enhanced usage examples with evaluation results
+
+### 🔧 Technical
+- Added `calc_color_diff_patches()` method for quality evaluation
+- Implemented CIE 2000 color difference calculation
+- Enhanced debug visualization capabilities
+- Added support for multiple correction models
+
+
 ## [v0.0.1b0] - 2025-02-03
 
 ### 🔧 Improvements
