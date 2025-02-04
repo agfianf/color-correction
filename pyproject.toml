@@ -1,6 +1,6 @@
 [project]
 name = "color-correction-asdfghjkl"
-version = "0.0.1b0"
+version = "0.0.1b1"
 description = "help to do color correction on images based on color checker card classic 24 patch."
 keywords = ["color correction", "color-correction", "color consistency", "color-consistency"]
 readme = "README.md"
@@ -15,6 +15,10 @@ dependencies = [
     "shapely>=2.0.6",
     "colour-science>=0.4.6",
     "scikit-learn>=1.6.1",
+    "matplotlib>=3.10.0",
+    "opencv-python-headless>=4.11.0.86",
+    "onnx>=1.17.0",
+    "onnxruntime>=1.20.1",
 ]
 classifiers = [
     'Programming Language :: Python :: 3 :: Only',
@@ -32,16 +36,6 @@ Issues = "https://github.com/agfianf/color-correction-asdfghjkl/issues"
 
 
 [dependency-groups]
-default = [
-    "opencv-python-headless>=4.11.0.86",
-]
-analyze = [
-    "matplotlib>=3.10.0",
-]
-yolodet = [
-    "onnx>=1.17.0",
-    "onnxruntime>=1.20.1",
-]
 mccdet = [
     "opencv-contrib-python>=4.11.0.86",
 ]
