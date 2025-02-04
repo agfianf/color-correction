@@ -10,6 +10,11 @@ This package is designed to perform color correction on images using the Color C
 ```bash
 pip install color-correction-asdfghjkl
 ```
+
+## 🏋️‍♀️ How it works
+![How it works](assets/color-correction-how-it-works.png)
+
+
 ## Usage
 
 ```python
@@ -75,8 +80,6 @@ print(eval_result)
 - **Accuracy**: Leverage the color correction matrix for precise color adjustments.
 - **Flexibility**: Adaptable for various image sets with different color profiles.
 
-## 🏋️‍♀️ How it works
-![How it works](assets/color-correction-how-it-works.png)
 
 ## 🤸 TODO
 - [ ] Add Loggers
