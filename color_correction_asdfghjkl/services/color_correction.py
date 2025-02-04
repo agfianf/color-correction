@@ -1,7 +1,6 @@
 import os
 from typing import Literal
 
-import colour as cl
 import cv2
 import numpy as np
 from numpy.typing import NDArray
@@ -16,6 +15,7 @@ from color_correction_asdfghjkl.utils.image_patch import (
     create_patch_tiled_image,
     visualize_patch_comparison,
 )
+from color_correction_asdfghjkl.utils.image_processing import calc_color_diff
 from color_correction_asdfghjkl.utils.visualization_utils import (
     create_image_grid_visualization,
 )
@@ -83,6 +83,10 @@ class ColorCorrection:
         self.input_patches = None
         self.input_grid_image = None
         self.input_debug_image = None
+
+        # Initialize correction output attributes
+        self.corrected_patches = None
+        self.corrected_grid_image = None
 
         # Initialize model attributes
         self.trained_model = None
@@ -178,17 +182,12 @@ class ColorCorrection:
         output_directory : str
             Directory to save debug outputs.
         """
-        predicted_patches = self.correction_model.compute_correction(
-            input_image=np.array(self.input_patches),
-        )
-        predicted_grid = create_patch_tiled_image(predicted_patches)
-
         before_comparison = visualize_patch_comparison(
             ls_mean_in=self.input_patches,
             ls_mean_ref=self.reference_patches,
         )
         after_comparison = visualize_patch_comparison(
-            ls_mean_in=predicted_patches,
+            ls_mean_in=self.corrected_patches,
             ls_mean_ref=self.reference_patches,
         )
 
@@ -204,7 +203,7 @@ class ColorCorrection:
             ("Reference vs Corrected", after_comparison),
             ("[Free Space]", None),
             ("Patch Input", self.input_grid_image),
-            ("Patch Corrected", predicted_grid),
+            ("Patch Corrected", self.corrected_grid_image),
             ("Patch Reference", self.reference_grid_image),
         ]
 
@@ -239,11 +238,17 @@ class ColorCorrection:
 
     @property
     def model_name(self) -> str:
+        "Return the name of the correction model."
         return self.correction_model.__class__.__name__
 
     @property
-    def img_grid_patches_ref(self) -> np.ndarray:
-        return create_patch_tiled_image(self.reference_color_card)
+    def ref_patches(self) -> np.ndarray:
+        """Return grid image of reference color patches."""
+        return (
+            self.reference_patches,
+            self.reference_grid_image,
+            self.reference_debug_image,
+        )
 
     def set_reference_patches(
         self,
@@ -270,6 +275,7 @@ class ColorCorrection:
             self.input_grid_image,
             self.input_debug_image,
         ) = self._extract_color_patches(image=image, debug=debug)
+        return self.input_patches, self.input_grid_image, self.input_debug_image
 
     def fit(self) -> tuple[NDArray, list[ColorPatchType], list[ColorPatchType]]:
         """Fit color correction model using input and reference images.
@@ -296,6 +302,12 @@ class ColorCorrection:
             x_patches=self.input_patches,
             y_patches=self.reference_patches,
         )
+
+        # Compute corrected patches
+        self.corrected_patches = self.correction_model.compute_correction(
+            input_image=np.array(self.input_patches),
+        )
+        self.corrected_grid_image = create_patch_tiled_image(self.corrected_patches)
 
         return self.trained_model
 
@@ -342,42 +354,37 @@ class ColorCorrection:
 
         return corrected_image
 
-    def calc_color_diff(
-        self,
-        image1: ImageType,
-        image2: ImageType,
-    ) -> tuple[float, float, float, float]:
-        """Calculate color difference metrics between two images.
-
-        Parameters
-        ----------
-        image1, image2 : NDArray
-            Images to compare in BGR format.
-
-        Returns
-        -------
-        Tuple[float, float, float, float]
-            Minimum, maximum, mean, and standard deviation of delta E values.
-        """
-        rgb1 = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
-        rgb2 = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
-
-        lab1 = cl.XYZ_to_Lab(cl.sRGB_to_XYZ(rgb1 / 255))
-        lab2 = cl.XYZ_to_Lab(cl.sRGB_to_XYZ(rgb2 / 255))
-
-        delta_e = cl.difference.delta_E(lab1, lab2, method="CIE 2000")
-
-        return (
-            float(np.min(delta_e)),
-            float(np.max(delta_e)),
-            float(np.mean(delta_e)),
-            float(np.std(delta_e)),
+    def calc_color_diff_patches(self) -> dict:
+        initial_color_diff = calc_color_diff(
+            image1=self.input_grid_image,
+            image2=self.reference_grid_image,
         )
+
+        corrected_color_diff = calc_color_diff(
+            image1=self.corrected_grid_image,
+            image2=self.reference_grid_image,
+        )
+
+        delta_color_diff = {
+            "min": initial_color_diff["min"] - corrected_color_diff["min"],
+            "max": initial_color_diff["max"] - corrected_color_diff["max"],
+            "mean": initial_color_diff["mean"] - corrected_color_diff["mean"],
+            "std": initial_color_diff["std"] - corrected_color_diff["std"],
+        }
+
+        info = {
+            "initial": initial_color_diff,
+            "corrected": corrected_color_diff,
+            "delta": delta_color_diff,
+        }
+
+        return info
 
 
 if __name__ == "__main__":
     # Step 1: Define the path to the input image
     image_path = "asset/images/cc-19.png"
+    image_path = "asset/images/cc-1.jpg"
 
     # Step 2: Load the input image
     input_image = cv2.imread(image_path)
@@ -386,12 +393,18 @@ if __name__ == "__main__":
     color_corrector = ColorCorrection(
         detection_model="yolov8",
         detection_conf_th=0.25,
-        correction_model="least_squares",
-        degree=2,  # for polynomial correction model
+        correction_model="polynomial",
+        # correction_model="least_squares",
+        # correction_model="affine_reg",
+        # correction_model="linear_reg",
+        degree=3,  # for polynomial correction model
         use_gpu=True,
     )
 
     # Step 4: Extract color patches from the input image
+    # you can set reference patches from another image (image has color checker card)
+    # or use the default D50
+    # color_corrector.set_reference_patches(image=None, debug=True)
     color_corrector.set_input_patches(image=input_image, debug=True)
     color_corrector.fit()
     corrected_image = color_corrector.predict(
@@ -399,3 +412,6 @@ if __name__ == "__main__":
         debug=True,
         debug_output_dir="zzz",
     )
+
+    eval_result = color_corrector.calc_color_diff_patches()
+    print(eval_result)
