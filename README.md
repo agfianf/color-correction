@@ -23,12 +23,15 @@ input_image = cv2.imread(image_path)
 color_corrector = ColorCorrection(
     detection_model="yolov8",
     detection_conf_th=0.25,
-    correction_model="least_squares",
-    degree=2, # for polynomial correction model
+    correction_model="polynomial", # "least_squares", "affine_reg", "linear_reg"
+    degree=3,  # for polynomial correction model
     use_gpu=True,
 )
 
 # Step 4: Extract color patches from the input image
+# you can set reference patches from another image (image has color checker card)
+# or use the default D50
+# color_corrector.set_reference_patches(image=None, debug=True)
 color_corrector.set_input_patches(image=input_image, debug=True)
 color_corrector.fit()
 corrected_image = color_corrector.predict(
@@ -37,17 +40,50 @@ corrected_image = color_corrector.predict(
     debug_output_dir="zzz",
 )
 
+# Step 5: Evaluate the color correction results
+eval_result = color_corrector.calc_color_diff_patches()
+print(eval_result)
 ```
-Sample output:
-![Sample Output](assets/sample-output-usage.png)
+- Output evaluation result:
+    ```json
+    {
+        "initial": {
+            "min": 2.254003059526461,
+            "max": 13.461066402633447,
+            "mean": 8.3072755187654,
+            "std": 3.123962754767539,
+        },
+        "corrected": {
+            "min": 0.30910031798755183,
+            "max": 5.422311999126372,
+            "mean": 1.4965478752947827,
+            "std": 1.2915738724958112,
+        },
+        "delta": {
+            "min": 1.9449027415389093,
+            "max": 8.038754403507074,
+            "mean": 6.810727643470616,
+            "std": 1.8323888822717276,
+        },
+    }
+    ```
+- Sample output debug image (polynomial degree=2):
+    ![Sample Output](assets/sample-output-debug.jpg)
 
 ## 📈 Benefits
 - **Consistency**: Ensure uniform color correction across multiple images.
 - **Accuracy**: Leverage the color correction matrix for precise color adjustments.
 - **Flexibility**: Adaptable for various image sets with different color profiles.
 
+## 🏋️‍♀️ How it works
 ![How it works](assets/color-correction-how-it-works.png)
 
+## 🤸 TODO
+- [ ] Add Loggers
+- [ ] Add detection MCC:CCheckerDetector from opencv
+- [ ] Add Segmentation Color Checker using YOLOv11 ONNX
+- [ ] Improve validation preprocessing (e.g., auto-match-orientation CC)
+- [ ] Add more analysis and evaluation metrics (Still thinking...)
 
 <!-- write reference -->
 ## 📚 References
