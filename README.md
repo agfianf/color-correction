@@ -1,14 +1,12 @@
 
 # 🎨 Color Correction
 
-> **Note:** The "asdfghjkl" is just a placeholder due to some naming difficulties.
-
 This package is designed to perform color correction on images using the Color Checker Classic 24 Patch card. It provides a robust solution for ensuring accurate color representation in your images.
 
 ## 📦 Installation
 
 ```bash
-pip install color-correction-asdfghjkl
+pip install color-correction
 ```
 
 ## 🏋️‍♀️ How it works
@@ -18,6 +16,8 @@ pip install color-correction-asdfghjkl
 ## ⚡ How to use
 
 ```python
+from color_correction import ColorCorrection
+
 # Step 1: Define the path to the input image
 image_path = "asset/images/cc-19.png"
 

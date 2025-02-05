@@ -1,13 +1,13 @@
 import cv2
 import numpy as np
 
-from color_correction_asdfghjkl.schemas.det_yv8 import DetectionResult
-from color_correction_asdfghjkl.utils.geometry_processing import (
+from color_correction.schemas.det_yv8 import DetectionResult
+from color_correction.utils.geometry_processing import (
     extract_intersecting_patches,
     generate_expected_patches,
     suggest_missing_patch_coordinates,
 )
-from color_correction_asdfghjkl.utils.image_processing import (
+from color_correction.utils.image_processing import (
     calc_mean_color_patch,
     crop_region_with_margin,
 )

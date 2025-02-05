@@ -35,5 +35,5 @@ jobs:
 
       - name: Run tests with Coverage
         run: |
-          uv run pytest --cov-report=term-missing --cov=color_correction_asdfghjkl tests/
+          uv run pytest --cov-report=term-missing --cov=color_correction tests/
           uv run coverage report --fail-under=35

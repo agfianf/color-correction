@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from color_correction_asdfghjkl.utils.yolo_utils import (
+from color_correction.utils.yolo_utils import (
     compute_iou,
     multiclass_nms,
     nms,

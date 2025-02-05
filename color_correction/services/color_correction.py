@@ -5,18 +5,18 @@ import cv2
 import numpy as np
 from numpy.typing import NDArray
 
-from color_correction_asdfghjkl.constant.color_checker import reference_color_d50_bgr
-from color_correction_asdfghjkl.core.card_detection.det_yv8_onnx import (
+from color_correction.constant.color_checker import reference_color_d50_bgr
+from color_correction.core.card_detection.det_yv8_onnx import (
     YOLOv8CardDetector,
 )
-from color_correction_asdfghjkl.core.correction import CorrectionModelFactory
-from color_correction_asdfghjkl.processor.det_yv8 import DetectionProcessor
-from color_correction_asdfghjkl.utils.image_patch import (
+from color_correction.core.correction import CorrectionModelFactory
+from color_correction.processor.det_yv8 import DetectionProcessor
+from color_correction.utils.image_patch import (
     create_patch_tiled_image,
     visualize_patch_comparison,
 )
-from color_correction_asdfghjkl.utils.image_processing import calc_color_diff
-from color_correction_asdfghjkl.utils.visualization_utils import (
+from color_correction.utils.image_processing import calc_color_diff
+from color_correction.utils.visualization_utils import (
     create_image_grid_visualization,
 )
 

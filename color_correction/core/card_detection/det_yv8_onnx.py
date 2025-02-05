@@ -4,10 +4,10 @@ import cv2
 import numpy as np
 import onnxruntime
 
-from color_correction_asdfghjkl.core.card_detection.base import BaseCardDetector
-from color_correction_asdfghjkl.schemas.det_yv8 import DetectionResult
-from color_correction_asdfghjkl.utils.downloader import downloader_model_yolov8
-from color_correction_asdfghjkl.utils.yolo_utils import (
+from color_correction.core.card_detection.base import BaseCardDetector
+from color_correction.schemas.det_yv8 import DetectionResult
+from color_correction.utils.downloader import downloader_model_yolov8
+from color_correction.utils.yolo_utils import (
     multiclass_nms,
     xywh2xyxy,
 )
@@ -180,9 +180,9 @@ class YOLOv8CardDetector(BaseCardDetector):
 
 if __name__ == "__main__":
     print("YOLOv8CardDetector")
-    model_path = "color_correction_asdfghjkl/asset/.model/yv8-det.onnx"
-    image_path = "color_correction_asdfghjkl/asset/images/cc-1.jpg"
-    image_path = "color_correction_asdfghjkl/asset/images/Test 19.png"
+    model_path = "color_correction/asset/.model/yv8-det.onnx"
+    image_path = "color_correction/asset/images/cc-1.jpg"
+    image_path = "color_correction/asset/images/Test 19.png"
     detector = YOLOv8CardDetector(conf_th=0.15, iou_th=0.7, use_gpu=True)
 
     input_image = cv2.imread(image_path)

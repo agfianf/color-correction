@@ -2,7 +2,7 @@ import platform
 import subprocess
 from typing import Any
 
-from color_correction_asdfghjkl.schemas.device import (
+from color_correction.schemas.device import (
     CPUArchitecture,
     DeviceSpecs,
     GPUType,

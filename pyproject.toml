@@ -1,6 +1,6 @@
 [project]
-name = "color-correction-asdfghjkl"
-version = "0.0.1b1"
+name = "color-correction"
+version = "0.0.1b2"
 description = "help to do color correction on images based on color checker card classic 24 patch."
 keywords = ["color correction", "color-correction", "color consistency", "color-consistency"]
 readme = "README.md"
@@ -31,8 +31,8 @@ classifiers = [
 
 
 [project.urls]
-Repository = "https://github.com/agfianf/color-correction-asdfghjkl"
-Issues = "https://github.com/agfianf/color-correction-asdfghjkl/issues"
+Repository = "https://github.com/agfianf/color-correction"
+Issues = "https://github.com/agfianf/color-correction/issues"
 
 
 [dependency-groups]
@@ -56,7 +56,7 @@ build-backend = "hatchling.build"
 
 
 [tool.hatch.build.targets.wheel]
-packages = ["color_correction_asdfghjkl"]
+packages = ["color_correction"]
 
 # ---- ruff ----
 [tool.ruff]

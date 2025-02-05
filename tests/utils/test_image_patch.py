@@ -1,8 +1,7 @@
 import numpy as np
 import pytest
-import cv2
 
-from color_correction_asdfghjkl.utils.image_patch import (
+from color_correction.utils.image_patch import (
     create_patch_tiled_image,
     visualize_patch_comparison,
 )

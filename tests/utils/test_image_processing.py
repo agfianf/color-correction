@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from color_correction_asdfghjkl.utils.image_processing import crop_region_with_margin, calc_mean_color_patch
+from color_correction.utils.image_processing import crop_region_with_margin, calc_mean_color_patch
 
 @pytest.fixture
 def known_image() -> np.ndarray:

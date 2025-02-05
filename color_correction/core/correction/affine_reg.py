@@ -3,14 +3,14 @@ import time
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-from color_correction_asdfghjkl.core.correction.base import BaseComputeCorrection
-from color_correction_asdfghjkl.utils.correction import (
+from color_correction.core.correction.base import BaseComputeCorrection
+from color_correction.utils.correction import (
     postprocessing_compute,
     preprocessing_compute,
 )
 
 
-class LinearReg(BaseComputeCorrection):
+class AffineReg(BaseComputeCorrection):
     def __init__(self) -> None:
         self.model = None
 
@@ -20,7 +20,9 @@ class LinearReg(BaseComputeCorrection):
         y_patches: np.ndarray,  # reference patches
     ) -> np.ndarray:
         start_time = time.perf_counter()
-
+        x_patches = np.array(x_patches)
+        print("x_patches.shape", x_patches.shape)
+        x_patches = np.hstack([x_patches, np.ones((x_patches.shape[0], 1))])
         self.model = LinearRegression(fit_intercept=False).fit(x_patches, y_patches)
 
         exc_time = time.perf_counter() - start_time
@@ -33,6 +35,7 @@ class LinearReg(BaseComputeCorrection):
 
         org_input_shape = input_image.shape
         input_image = preprocessing_compute(input_image)
+        input_image = np.hstack([input_image, np.ones((input_image.shape[0], 1))])
         image = self.model.predict(input_image)
         corrected_image = postprocessing_compute(org_input_shape, image)
         return corrected_image
