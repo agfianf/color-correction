@@ -5,9 +5,9 @@
 
 <br>
 
-[![version](https://badge.fury.io/py/color-correction-asdfghjkl.svg)](https://badge.fury.io/py/color-correction-asdfghjkl)
-[![downloads](https://img.shields.io/pypi/dm/color-correction-asdfghjkl)](https://pypistats.org/packages/color-correction-asdfghjkl)
-[![python-version](https://img.shields.io/pypi/pyversions/color-correction-asdfghjkl)](https://badge.fury.io/py/color-correction-asdfghjkl)
+[![version](https://badge.fury.io/py/color-correction.svg)](https://badge.fury.io/py/color-correction)
+[![downloads](https://img.shields.io/pypi/dm/color-correction)](https://pypistats.org/packages/color-correction)
+[![python-version](https://img.shields.io/pypi/pyversions/color-correction)](https://badge.fury.io/py/color-correction)
 
 </div>
 
