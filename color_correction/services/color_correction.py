@@ -1,16 +1,20 @@
 import os
-from typing import Literal
 
 import cv2
 import numpy as np
 from numpy.typing import NDArray
 
 from color_correction.constant.color_checker import reference_color_d50_bgr
+from color_correction.constant.methods import (
+    LiteralModelCorrection,
+    LiteralModelDetection,
+)
 from color_correction.core.card_detection.det_yv8_onnx import (
     YOLOv8CardDetector,
 )
 from color_correction.core.correction import CorrectionModelFactory
 from color_correction.processor.det_yv8 import DetectionProcessor
+from color_correction.schemas.images import ColorPatchType, ImageType
 from color_correction.utils.image_patch import (
     create_patch_tiled_image,
     visualize_patch_comparison,
@@ -19,15 +23,6 @@ from color_correction.utils.image_processing import calc_color_diff
 from color_correction.utils.visualization_utils import (
     create_image_grid_visualization,
 )
-
-ColorPatchType = NDArray[np.uint8]
-ImageType = NDArray[np.uint8]
-LiteralModelCorrection = Literal[
-    "least_squares",
-    "polynomial",
-    "linear_reg",
-    "affine_reg",
-]
 
 
 class ColorCorrection:
@@ -51,7 +46,7 @@ class ColorCorrection:
         Reference image containing color checker card.
         If None, uses standard D50 values.
     use_gpu : bool, default=True
-        Whether to use GPU for card detection.
+        Whether to use GPU for card detection. False will use CPU.
     **kwargs : dict
         Additional parameters for the correction model.
 
@@ -67,7 +62,7 @@ class ColorCorrection:
 
     def __init__(
         self,
-        detection_model: Literal["yolov8"] = "yolov8",
+        detection_model: LiteralModelDetection = "yolov8",
         detection_conf_th: float = 0.25,
         correction_model: LiteralModelCorrection = "least_squares",
         reference_image: ImageType | None = None,

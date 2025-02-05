@@ -2,6 +2,10 @@
 from datetime import datetime
 from importlib import resources
 
+import pandas as pd
+
+from color_correction.utils.formater import format_value
+
 
 class ReportGenerator:
     def __init__(self) -> None:
@@ -47,3 +51,32 @@ class ReportGenerator:
             </tbody>
         </table>
         """
+
+    def generate_html_report(self, df: pd.DataFrame, path_html: str) -> str:
+        """Generate HTML report from DataFrame with images"""
+        df_html = df.copy()
+
+        # Generate rows
+        rows = []
+        for _, row in df_html.iterrows():
+            row_html = "<tr>"
+            for value in row:
+                formatted_value = format_value(value)
+                row_html += f"<td>{formatted_value}</td>"
+            row_html += "</tr>"
+            rows.append(row_html)
+
+        table_html = self.generate_table(
+            headers=df.columns.tolist(),
+            rows=rows,
+        )
+        report_html = self.generate_report(table_html)
+
+        with open(path_html, "w") as f:
+            f.write(report_html)
+
+        return report_html
+
+    def save_dataframe(self, df: pd.DataFrame, filepath: str) -> None:
+        """Save DataFrame with pickle to preserve numpy arrays"""
+        df.to_pickle(filepath)
