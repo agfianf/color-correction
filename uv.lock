@@ -120,8 +120,8 @@ wheels = [
 ]
 
 [[package]]
-name = "color-correction-asdfghjkl"
-version = "0.0.1b1"
+name = "color-correction"
+version = "0.0.1b3"
 source = { editable = "." }
 dependencies = [
     { name = "colour-science" },
