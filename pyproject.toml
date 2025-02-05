@@ -2,9 +2,12 @@
 name = "color-correction"
 version = "0.0.1b2"
 description = "help to do color correction on images based on color checker card classic 24 patch."
-keywords = ["color correction", "color-correction", "color consistency", "color-consistency"]
+keywords = ["color correction", "color-correction", "color consistency", "color-consistency", "vision", "computer vision"]
 readme = "README.md"
 authors = [
+    { name = "magfianf", email = "muhammadagfian96@gmail.com" }
+]
+maintainers = [
     { name = "magfianf", email = "muhammadagfian96@gmail.com" }
 ]
 requires-python = ">=3.10"
@@ -31,6 +34,7 @@ classifiers = [
 
 
 [project.urls]
+Homepage = "https://github.com/agfianf/color-correction"
 Repository = "https://github.com/agfianf/color-correction"
 Issues = "https://github.com/agfianf/color-correction/issues"
 
