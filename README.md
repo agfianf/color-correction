@@ -97,6 +97,41 @@ print(eval_result)
 
 </details>
 
+## 🔎 Reporting
+```python
+import cv2
+
+from color_correction import CorrectionReport
+
+# input_image_path = "assets/cc-19.png"
+input_image_path = "assets/cc-1.jpg"
+
+report = CorrectionReport(
+    list_correction_methods=[
+        ("least_squares", {}),
+        ("linear_reg", {}),
+        ("affine_reg", {}),
+        ("polynomial", {"degree": 2}),
+        ("polynomial", {"degree": 3}),
+        # ("polynomial", {"degree": 4}),
+        # ("polynomial", {"degree": 5}),
+    ],
+    list_detection_methods=[
+        ("yolov8", {"detection_conf_th": 0.25}),
+    ],
+)
+report.run(
+    input_image=cv2.imread(input_image_path),
+    reference_image=None,
+    output_dir="report-output",
+)
+```
+<details>
+<summary>Sample Report Output</summary>
+
+![Sample Benchmark Output](assets/sample-benchmark.png)
+</details>
+
 ## 📈 Benefits
 - **Consistency**: Ensure uniform color correction across multiple images.
 - **Accuracy**: Leverage the color correction matrix for precise color adjustments.
