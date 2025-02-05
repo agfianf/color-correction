@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        {styles}
+    </style>
+    <script>
+        {scripts}
+    </script>
+</head>
+<body>
+    <div class="report-container">
+        <div class="report-header">
+            <h1>Detection and Correction Report</h1>
+            <div class="timestamp">Generated on: {current_time}</div>
+        </div>
+        <div class="table-container">
+            {body_report}
+        </div>
+        {column_descriptions}
+    </div>
+    <button onclick="exportToPDF()" class="export-btn">Export to PDF</button>
+</body>
+</html>
