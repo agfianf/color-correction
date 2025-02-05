@@ -1,11 +1,11 @@
 # Changelog
 
 ## [v0.0.1b3] - 2025-02-06
-**Add Report Capabilities and Bug Fixes**
+**Add Analyzer Report and Bug Fixes**
 
 ### 🚀 Features
 - Added comprehensive reporting functionality for color correction results
-  - New `CorrectionReport` class for benchmarking different correction methods
+  - New `ColorCorrectionAnalyzer` class for benchmarking different correction methods
   - HTML report generation with interactive sorting and PDF export
   - Visual comparison of before/after color patches
   - Detailed ΔE metrics for patches and full images
@@ -19,8 +19,8 @@
   - Detailed column descriptions
 
 ### 📝 Documentation
-- Added new Reporting section in README
-  - Example usage code for CorrectionReport
+- Added new Analyzer section in README
+  - Example usage code for ColorCorrectionAnalyzer
   - Sample benchmark output visualization
 - Updated version to 0.0.1b3
 

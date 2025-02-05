@@ -101,12 +101,12 @@ print(eval_result)
 ```python
 import cv2
 
-from color_correction import CorrectionReport
+from color_correction import ColorCorrectionAnalyzer
 
 # input_image_path = "assets/cc-19.png"
 input_image_path = "assets/cc-1.jpg"
 
-report = CorrectionReport(
+report = ColorCorrectionAnalyzer(
     list_correction_methods=[
         ("least_squares", {}),
         ("linear_reg", {}),

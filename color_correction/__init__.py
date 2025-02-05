@@ -6,7 +6,7 @@ from .constant.color_checker import reference_color_d50_rgb as REFERENCE_COLOR_D
 from .core.card_detection.det_yv8_onnx import YOLOv8CardDetector
 from .schemas.det_yv8 import DetectionResult as YOLOv8DetectionResult
 from .services.color_correction import ColorCorrection
-from .services.report import CorrectionReport
+from .services.correction_analyzer import ColorCorrectionAnalyzer
 # fmt: on
 
 __all__ = [
@@ -14,7 +14,7 @@ __all__ = [
     "REFERENCE_COLOR_D50_BGR",
     "REFERENCE_COLOR_D50_RGB",
     "ColorCorrection",
-    "CorrectionReport",
+    "ColorCorrectionAnalyzer",
     "YOLOv8CardDetector",
     "YOLOv8DetectionResult",
 ]

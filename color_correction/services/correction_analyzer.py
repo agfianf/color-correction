@@ -15,7 +15,7 @@ from color_correction.utils.image_processing import calc_color_diff
 from color_correction.utils.report_generator import ReportGenerator
 
 
-class CorrectionReport:
+class ColorCorrectionAnalyzer:
     def __init__(
         self,
         list_correction_methods: list[tuple[LiteralModelCorrection, dict]],
@@ -151,7 +151,7 @@ if __name__ == "__main__":
     # Pastikan path image sesuai dengan lokasi image Anda
     input_image_path = "asset/images/cc-19.png"
 
-    benchmark = CorrectionReport(
+    benchmark = ColorCorrectionAnalyzer(
         list_correction_methods=[
             ("least_squares", {}),
             ("linear_reg", {}),

@@ -5,7 +5,7 @@
             <h4>Detection & Correction Process</h4>
             <ul>
                 <li><strong>Index:</strong> Row number identifier</li>
-                <li><strong>Detection Method:</strong> Method used for color chart detection</li>
+                <li><strong>Detection Method:</strong> Method used for color checker card and patches detection</li>
                 <li><strong>Detection Parameters:</strong> Parameters used in the detection process</li>
                 <li><strong>Correction Method:</strong> Method used for color correction</li>
                 <li><strong>Correction Parameters:</strong> Parameters used in the correction process</li>
@@ -14,18 +14,32 @@
         <div class="description-item">
             <h4>Images</h4>
             <ul>
-                <li><strong>Drawed Preprocessing Input/Reference:</strong> Debug visualization of preprocessing step</li>
-                <li><strong>Color Patches - Before/After:</strong> Color patches comparison before and after correction</li>
+                <li><strong>Drawed Preprocessing Input/Reference:</strong> Draw visualization of preprocessing step (detection card, expected patches, etc/) </li>
+                <li><strong>Color Patches - Before/After:</strong> Color patches comparison before and after correction. Outer is reference and inside is input before/after correction</li>
                 <li><strong>Input/Corrected Image:</strong> Original and color-corrected images</li>
             </ul>
         </div>
         <div class="description-item">
-            <h4>Color Difference Metrics (ΔE)</h4>
+            <h4>Color Difference Metrics (ΔE CIE 2000)</h4>
             <ul>
-                <li><strong>Patch ΔE (Before):</strong> Color difference statistics for patches before correction</li>
-                <li><strong>Patch ΔE (After):</strong> Color difference statistics for patches after correction</li>
+                <li><strong>Patch ΔE (Before):</strong> Color difference statistics between reference and input patches before correction
+                    <ul style="list-style: none; padding-left: 20px;">
+                        <li>• 0-1: Not perceptible difference</li>
+                        <li>• 1-2: Perceptible through close observation</li>
+                        <li>• 2-10: Perceptible at a glance</li>
+                        <li>• 10+: Clear color difference</li>
+                    </ul>
+                </li>
+                <li><strong>Patch ΔE (After):</strong> Color difference statistics between reference and corrected patches</li>
                 <li><strong>Image ΔE:</strong> Overall image color difference statistics</li>
-                <li>Statistics include: Minimum, Maximum, Mean, and Standard Deviation values</li>
+                <li><strong>Statistics include:</strong>
+                    <ul style="list-style: none; padding-left: 20px;">
+                        <li>• Minimum: Smallest color difference</li>
+                        <li>• Maximum: Largest color difference</li>
+                        <li>• Mean: Average color difference</li>
+                        <li>• Standard Deviation: Variation in differences</li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>
