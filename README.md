@@ -11,7 +11,7 @@
 
 </div>
 
-> _Package formerly published as `color-correction-asdfghjkl` on PyPI. The name has been simplified for better accessibility and professional recognition._
+> _Package formerly published as [`color-correction-asdfghjkl`](https://pypi.org/project/color-correction-asdfghjkl/) on PyPI. The name has been simplified for better accessibility and professional recognition._
 
 This package is designed to perform color correction on images using the Color Checker Classic 24 Patch card. It provides a robust solution for ensuring accurate color representation in your images.
 

@@ -3,6 +3,14 @@ name: 🧪 Test
 on:
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.pre-commit-config.yaml'
+      - 'mkdocs.yml'
+      - 'docs_requirements.txt'
 
 jobs:
   test:
