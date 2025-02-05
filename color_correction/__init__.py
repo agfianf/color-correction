@@ -1,4 +1,4 @@
-__version__ = "0.0.1b2"
+__version__ = "0.0.1b3"
 
 # fmt: off
 from .constant.color_checker import reference_color_d50_bgr as REFERENCE_COLOR_D50_BGR  # noqa: N812, I001

@@ -1,6 +1,6 @@
 [project]
 name = "color-correction"
-version = "0.0.1b2"
+version = "0.0.1b3"
 description = "help to do color correction on images based on color checker card classic 24 patch."
 keywords = ["color correction", "color-correction", "color consistency", "color-consistency", "vision", "computer vision"]
 readme = "README.md"
