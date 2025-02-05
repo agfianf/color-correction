@@ -1,7 +1,11 @@
+import base64
+import io
+
 import colour as cl
 import cv2
 import numpy as np
 from numpy.typing import NDArray
+from PIL import Image
 
 ImageType = NDArray[np.uint8]
 
@@ -85,8 +89,25 @@ def calc_color_diff(
     delta_e = cl.difference.delta_E(lab1, lab2, method="CIE 2000")
 
     return {
-        "min": float(np.min(delta_e)),
-        "max": float(np.max(delta_e)),
-        "mean": float(np.mean(delta_e)),
-        "std": float(np.std(delta_e)),
+        "min": round(float(np.min(delta_e)), 4),
+        "max": round(float(np.max(delta_e)), 4),
+        "mean": round(float(np.mean(delta_e)), 4),
+        "std": round(float(np.std(delta_e)), 4),
     }
+
+
+def numpy_array_to_base64(
+    arr: np.ndarray,
+    convert_bgr_to_rgb: bool = True,
+) -> str:
+    """Convert numpy array (image) to base64 string"""
+    if arr is None:
+        return ""
+
+    if convert_bgr_to_rgb:
+        arr = cv2.cvtColor(arr, cv2.COLOR_BGR2RGB)
+    img = Image.fromarray(arr)
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    img_str = base64.b64encode(buffer.getvalue()).decode()
+    return f"data:image/png;base64,{img_str}"

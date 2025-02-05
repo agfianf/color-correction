@@ -1,6 +1,41 @@
 # Changelog
 
-## [v0.0.1b1] - 2025-02-03
+## [v0.0.1b3] - 2025-02-06
+**Add Analyzer Report and Bug Fixes**
+
+### 🚀 Features
+- Added comprehensive reporting functionality for color correction results
+  - New `ColorCorrectionAnalyzer` class for benchmarking different correction methods
+  - HTML report generation with interactive sorting and PDF export
+  - Visual comparison of before/after color patches
+  - Detailed ΔE metrics for patches and full images
+- Enhanced image processing utilities
+  - Added base64 image conversion support
+  - Improved color difference calculation with rounded metrics
+- Added HTML report generation templates and styling
+  - Responsive design with Plus Jakarta Sans font
+  - Interactive table sorting
+  - PDF export functionality
+  - Detailed column descriptions
+
+### 📝 Documentation
+- Added new Analyzer section in README
+  - Example usage code for ColorCorrectionAnalyzer
+  - Sample benchmark output visualization
+- Updated version to 0.0.1b3
+
+### 🔧 Technical Changes
+- Renamed benchmark class to report for better clarity
+- Added new utility modules:
+  - formater.py for value formatting
+  - report_generator.py for HTML generation
+  - Added new constants and method definitions
+
+## [v0.0.1b2] - 2025-02-05
+Fix naming from `color-correction-asdfghjkl` to `color-correction`
+
+
+## [v0.0.1b1] - 2025-02-04
 **Enhanced Color Correction with Improved Documentation and Evaluation**
 
 ### ✨ Features
