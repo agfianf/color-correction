@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from color_correction_asdfghjkl.schemas.det_yv8 import DetectionResult
+from color_correction.schemas.det_yv8 import DetectionResult
 
 
 class BaseCardDetector(ABC):

@@ -4,8 +4,8 @@ from typing import Final
 
 import httpx
 
-from color_correction_asdfghjkl.schemas.device import GPUType
-from color_correction_asdfghjkl.utils.device_info import get_device_specs
+from color_correction.schemas.device import GPUType
+from color_correction.utils.device_info import get_device_specs
 
 
 def download_google_drive_file(file_id: str, output_file: str) -> None:

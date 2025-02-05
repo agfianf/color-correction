@@ -1,6 +1,6 @@
 
 [run]
-source = color_correction_asdfghjkl
+source = color_correction
 omit =
     tests/*
 

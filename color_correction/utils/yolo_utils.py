@@ -9,7 +9,7 @@ This module provides utility functions for processing YOLOv8 detections, includi
 import cv2
 import numpy as np
 
-from color_correction_asdfghjkl.constant.yolov8_det import class_names
+from color_correction.constant.yolov8_det import class_names
 
 # Constants
 RANDOM_SEED = 3

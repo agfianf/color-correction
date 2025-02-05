@@ -1,7 +1,7 @@
 import numpy as np
 from pydantic import BaseModel
 
-from color_correction_asdfghjkl.utils.yolo_utils import draw_detections
+from color_correction.utils.yolo_utils import draw_detections
 
 BoundingBox = tuple[int, int, int, int]
 

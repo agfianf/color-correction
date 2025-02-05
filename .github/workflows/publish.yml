@@ -1,4 +1,4 @@
-name: Publish Python Package to PyPI
+name: 📦 Publish Python Package to PyPI
 
 on:
   push:
@@ -9,26 +9,25 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone repository
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Install uv and set the python version
+
+      - name: 🐍 Install uv and set the python version
         uses: astral-sh/setup-uv@v5
         with:
-          version: "0.5.23"
           enable-cache: true
           cache-dependency-glob: "uv.lock"
           python-version: 3.12
 
-      - name: Extract version from Git tag
+      - name: 🏷️ Extract version from Git tag
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
-    
-      - name: Clear directory
+
+      - name: 🧹 Clear directory
         run: rm -rf dist
 
-      - name: Build package
+      - name: 🔨 Build package
         run: uv build
 
-      - name: Publish to PyPI
+      - name: 🚀 Publish to PyPI
         run: uv publish --token ${{ secrets.PYPI_API_TOKEN }}
