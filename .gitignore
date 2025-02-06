@@ -24,3 +24,11 @@ color_correction/asset/images/
 playground/
 assets/cc-1.jpg
 assets/cc-19.png
+
+benchmark_debug/
+
+linkedln.md
+.env
+
+diff-output.txt
+log-output.txt
