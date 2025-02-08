@@ -1,5 +1,7 @@
 
 <div align="center">
+<!-- image logo -->
+<img src="assets/logo-v1.png" alt="Color Correction Logo" width="100"/>
 
 # Color Correction
 
