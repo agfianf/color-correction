@@ -163,7 +163,7 @@ class ColorCorrectionAnalyzer:
         input_image : np.ndarray
             The image to be processed.
         output_dir : str, optional
-            The directory to save reports, by default "benchmark_debug".
+            The directory to save reports, by default `benchmark_debug`.
         reference_image : np.ndarray, optional
             Optional reference image used for evaluation, by default None.
 
@@ -171,6 +171,15 @@ class ColorCorrectionAnalyzer:
         -------
         pd.DataFrame
             A DataFrame containing results of all experiments.
+
+        Notes
+        -----
+        The specified output directory will be created if it does not exist. All benchmark results are saved in this folder.
+        The directory to save benchmark results, by default "benchmark_debug". This folder will contain:
+
+        - **An HTML report**: includes a matrix table showing correction methods vs. evaluation delta E (CIE 2000) and preview images.
+        - **A CSV file**: A CSV report of the DataFrame with image data columns removed.
+        - **A PKL file**: A pickle file containing the full DataFrame.
 
         Examples
         --------
