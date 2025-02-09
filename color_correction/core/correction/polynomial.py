@@ -20,8 +20,9 @@ class Polynomial(BaseComputeCorrection):
     ----------
     **kwargs : dict, optional
         Keyword arguments. Recognized keyword:
-        degree : int, optional, default 2
-            Degree of the polynomial.
+
+        - `degree` : int, optional, default 2
+             Degree of the polynomial.
     """
 
     def __init__(self, **kwargs: dict) -> None:
@@ -60,17 +61,15 @@ class Polynomial(BaseComputeCorrection):
             Reference image patches.
         **kwargs : dict
             Additional keyword arguments. Recognized keyword:
-            degree : int, optional
-                Degree of the polynomial.
+
+            - `degree` : int, optional
+                 Degree of the polynomial.
 
         Returns
         -------
         np.ndarray
             Fitted model pipeline.
 
-        Notes
-        -----
-        The execution time for model fitting is printed.
         """
         start_time = time.perf_counter()
         degree = kwargs.get("degree", self.degree)

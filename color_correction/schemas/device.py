@@ -1,16 +1,16 @@
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class GPUType(str, Enum):
+class GPUType(StrEnum):
     NVIDIA = "NVIDIA"
     AMD = "AMD"
     APPLE = "Apple Integrated"
     UNKNOWN = "Unknown GPU"
 
 
-class CPUArchitecture(str, Enum):
+class CPUArchitecture(StrEnum):
     INTEL = "Intel"
     AMD = "AMD"
     ARM = "ARM"
@@ -19,7 +19,20 @@ class CPUArchitecture(str, Enum):
 
 
 class DeviceSpecs(BaseModel):
-    """Device specifications schema."""
+    """
+    Device specifications schema.
+
+    Attributes
+    ----------
+    os_name : str
+        Operating system name.
+    cpu_arch : CPUArchitecture
+        CPU architecture.
+    gpu_type : GPUType
+        GPU type.
+    is_apple_silicon : bool
+        Whether the device is Apple Silicon.
+    """
 
     os_name: str = Field(..., description="Operating system name")
     cpu_arch: CPUArchitecture = Field(

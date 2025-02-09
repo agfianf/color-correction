@@ -24,34 +24,22 @@ COLORS = rng.uniform(0, 255, size=(len(class_names), 3))
 
 # Detection Processing Functions
 def nms(boxes: np.ndarray, scores: np.ndarray, iou_threshold: float) -> list[int]:
-    """Apply Non-Maximum Suppression (NMS) to filter overlapping bounding boxes.
-
-    NMS is used to eliminate redundant bounding boxes in object detection tasks.
-    It selects the bounding boxes with the highest confidence scores while
-    removing boxes that overlap significantly with them.
-
-    Logic:
-    - No Overlap (IoU = 0):
-      Boxes are retained as they do not affect each other.
-    - High Overlap (IoU > threshold):
-      The box with the lower confidence score is removed, as it is considered
-      a duplicate detection of the same object.
-    - Low Overlap (IoU < threshold):
-      Both boxes are retained, as they are considered detections of different objects.
+    """
+    Apply Non-Maximum Suppression (NMS) to filter overlapping bounding boxes.
 
     Parameters
     ----------
     boxes : np.ndarray
-        Array of bounding boxes in format (x1, y1, x2, y2).
+        Array of bounding boxes with shape (N, 4) in (x1, y1, x2, y2) format.
     scores : np.ndarray
-        Array of confidence scores for each box.
+        Confidence scores for each bounding box.
     iou_threshold : float
-        IoU threshold for filtering overlapping boxes.
+        Threshold for Intersection over Union (IoU) to filter boxes.
 
     Returns
     -------
     list[int]
-        Indices of the bounding boxes to keep after applying NMS.
+        List of indices for boxes to keep.
     """
     # Sort by score
     sorted_indices = np.argsort(scores)[::-1]
@@ -84,23 +72,24 @@ def multiclass_nms(
     class_ids: np.ndarray,
     iou_threshold: float,
 ) -> list[int]:
-    """Apply non-maximum suppression to boxes across multiple classes.
+    """
+    Perform Non-Maximum Suppression (NMS) on boxes across multiple classes.
 
     Parameters
     ----------
     boxes : np.ndarray
-        Array of bounding boxes in format (x1, y1, x2, y2).
+        Array of bounding boxes in (x1, y1, x2, y2) format.
     scores : np.ndarray
-        Array of confidence scores for each box.
+        Confidence scores corresponding to each box.
     class_ids : np.ndarray
-        Array of class IDs for each box.
+        Class identifier for each bounding box.
     iou_threshold : float
-        IoU threshold for filtering overlapping boxes.
+        IoU threshold to determine overlapping boxes.
 
     Returns
     -------
     list[int]
-        Indices of boxes to keep after multiclass NMS.
+        List of indices for boxes to keep.
     """
     unique_class_ids = np.unique(class_ids)
 
@@ -116,19 +105,20 @@ def multiclass_nms(
 
 
 def compute_iou(box: np.ndarray, boxes: np.ndarray) -> np.ndarray:
-    """Compute Intersection over Union between a box and an array of boxes.
+    """
+    Compute the Intersection over Union (IoU) between a box and an array of boxes.
 
     Parameters
     ----------
     box : np.ndarray
-        Single box in format (x1, y1, x2, y2).
+        Single bounding box in (x1, y1, x2, y2) format.
     boxes : np.ndarray
-        Array of boxes to compute IoU with.
+        Array of boxes to compare against.
 
     Returns
     -------
     np.ndarray
-        Array of IoU values between the input box and each box in boxes.
+        Array containing the IoU of the input box with each box in 'boxes'.
     """
     box = box.astype(np.float32)
     boxes = boxes.astype(np.float32)
@@ -153,17 +143,18 @@ def compute_iou(box: np.ndarray, boxes: np.ndarray) -> np.ndarray:
 
 
 def xywh2xyxy(x: np.ndarray) -> np.ndarray:
-    """Convert bounding box format from (x, y, w, h) to (x1, y1, x2, y2).
+    """
+    Convert bounding boxes from (x, y, w, h) to (x1, y1, x2, y2) format.
 
     Parameters
     ----------
     x : np.ndarray
-        Array of boxes in (x, y, w, h) format.
+        Array of bounding boxes in (x, y, w, h) format.
 
     Returns
     -------
     np.ndarray
-        Array of boxes in (x1, y1, x2, y2) format.
+        Array of bounding boxes in (x1, y1, x2, y2) format.
     """
     # Convert bounding box (x, y, w, h) to bounding box (x1, y1, x2, y2)
     y = np.copy(x)
@@ -182,25 +173,26 @@ def draw_detections(
     class_ids: list[int],
     mask_alpha: float = DEFAULT_MASK_ALPHA,
 ) -> np.ndarray:
-    """Draw detection boxes, labels and masks on the image.
+    """
+    Draw bounding boxes, labels, and semi-transparent masks on an image.
 
     Parameters
     ----------
     image : np.ndarray
-        Input image to draw on.
+        The input image on which detections will be drawn.
     boxes : list[list[int]]
-        List of bounding boxes in format (x1, y1, x2, y2).
+        List of bounding boxes represented as (x1, y1, x2, y2).
     scores : list[float]
-        List of confidence scores for each detection.
+        Confidence scores for every box.
     class_ids : list[int]
-        List of class IDs for each detection.
+        Class IDs corresponding to each detection.
     mask_alpha : float, optional
-        Transparency of the mask overlay, by default DEFAULT_MASK_ALPHA.
+        Transparency of the drawn mask, default is DEFAULT_MASK_ALPHA.
 
     Returns
     -------
     np.ndarray
-        Image with drawn detections.
+        The annotated image with drawn detections.
     """
     det_img = image.copy()
     img_height, img_width = image.shape[:2]
@@ -230,23 +222,24 @@ def draw_box(
     color: tuple[int, int, int] = DEFAULT_COLOR,
     thickness: int = DEFAULT_THICKNESS,
 ) -> np.ndarray:
-    """Draw a bounding box on the image.
+    """
+    Draw a single bounding box on an image.
 
     Parameters
     ----------
     image : np.ndarray
-        Input image to draw on.
+        The original image.
     box : list[int]
-        Bounding box coordinates in format (x1, y1, x2, y2).
+        Bounding box coordinates in (x1, y1, x2, y2) format.
     color : tuple[int, int, int], optional
-        RGB color for the box, by default DEFAULT_COLOR.
+        Color of the box in RGB format; default is DEFAULT_COLOR.
     thickness : int, optional
-        Line thickness of the box, by default DEFAULT_THICKNESS.
+        Line thickness; default is DEFAULT_THICKNESS.
 
     Returns
     -------
     np.ndarray
-        Image with drawn box.
+        The image with the box drawn on it.
     """
     x1, y1, x2, y2 = box
     return cv2.rectangle(image, (x1, y1), (x2, y2), color, thickness)
@@ -260,27 +253,28 @@ def draw_text(
     font_size: float = 0.001,
     text_thickness: int = 2,
 ) -> np.ndarray:
-    """Draw text with background on the image.
+    """
+    Draw text with a background rectangle near a bounding box.
 
     Parameters
     ----------
     image : np.ndarray
-        Input image to draw on.
+        The image on which text is drawn.
     text : str
-        Text to be drawn.
+        Text string to be displayed.
     box : list[int]
-        Bounding box coordinates where text will be placed.
+        Bounding box coordinates (x1, y1, x2, y2) where the text will be placed.
     color : tuple[int, int, int], optional
-        RGB color for text background, by default DEFAULT_COLOR.
+        Background color for the text; default is DEFAULT_COLOR.
     font_size : float, optional
-        Size of the font, by default 0.001.
+        Font scaling factor; default is 0.001.
     text_thickness : int, optional
-        Thickness of the text, by default 2.
+        Thickness of the text stroke; default is 2.
 
     Returns
     -------
     np.ndarray
-        Image with drawn text.
+        Image with the annotated text.
     """
     x1, y1, x2, y2 = box
     (tw, th), _ = cv2.getTextSize(
@@ -311,23 +305,24 @@ def draw_masks(
     classes: list[int],
     mask_alpha: float = DEFAULT_MASK_ALPHA,
 ) -> np.ndarray:
-    """Draw semi-transparent masks for detection boxes.
+    """
+    Overlay semi-transparent masks on the image for detected objects.
 
     Parameters
     ----------
     image : np.ndarray
-        Input image to draw on.
+        The original image.
     boxes : list[list[int]]
-        List of bounding boxes in format (x1, y1, x2, y2).
+        List of bounding boxes in (x1, y1, x2, y2) format.
     classes : list[int]
-        List of class IDs for each box.
+        Class IDs corresponding to each bounding box.
     mask_alpha : float, optional
-        Transparency of the mask overlay, by default DEFAULT_MASK_ALPHA.
+        Alpha value for mask transparency; default is DEFAULT_MASK_ALPHA.
 
     Returns
     -------
     np.ndarray
-        Image with drawn masks.
+        The image with masks applied.
     """
     mask_img = image.copy()
 

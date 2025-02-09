@@ -55,23 +55,31 @@ theme:
     - search.suggest
     - content.code.copy
     - content.code.annotate
+    - content.action.view
+
 
 markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.superfences
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
   - attr_list
   - md_in_html
   - pymdownx.blocks.caption
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
   - pymdownx.critic
   - pymdownx.caret
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.tilde
   - def_list
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.highlight:
@@ -87,7 +95,7 @@ markdown_extensions:
         class: mermaid
         format: !!python/name:pymdownx.superfences.fence_code_format
   - toc:
-      permalink: "¤"
+      permalink: "¶"
 
 plugins:
   - search
@@ -148,14 +156,28 @@ nav:
   - Home: index.md
   - Tutorial: tutorials.md
   - Reference:
-      - Core:
-        - Card Detection:
+      - core:
+        - card_detection:
           - YoloV8 ONNX: reference/core/card_detection/yv8_onnx.md
-        - Correction:
+        - correction:
           - Least Squares: reference/core/correction/least_squares.md
           - Linear Regression: reference/core/correction/linear_reg.md
           - Affine Regression: reference/core/correction/affine_reg.md
           - Polynomial: reference/core/correction/polynomial.md
-      - Services:
-        - Color Correction: reference/services/color_correction.md
-        - Correction Analyzer: reference/services/correction_analyzer.md
+      - services:
+        - color_correction: reference/services/color_correction.md
+        - correction_analyzer: reference/services/correction_analyzer.md
+      - schemas:
+        - YoloV8 ONNX: reference/schemas/yv8_onnx.md
+        - Custom Types: reference/schemas/custom_types.md
+      - utils:
+        - correction: reference/utils/correction.md
+        - device_info: reference/utils/device_info.md
+        - downloader: reference/utils/downloader.md
+        - formater: reference/utils/formater.md
+        - geometry_proccesing: reference/utils/geometry_proccesing.md
+        - image_patch: reference/utils/image_patch.md
+        - image_processing: reference/utils/image_processing.md
+        - report_generator: reference/utils/report_generator.md
+        - visualization_utils: reference/utils/visualization_utils.md
+        - yolo_utils: reference/utils/yolo_utils.md

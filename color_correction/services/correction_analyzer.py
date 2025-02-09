@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from color_correction.constant.methods import (
+from color_correction.schemas.custom_types import (
     LiteralModelCorrection,
     LiteralModelDetection,
 )

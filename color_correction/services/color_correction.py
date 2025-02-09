@@ -2,19 +2,19 @@ import os
 
 import cv2
 import numpy as np
-from numpy.typing import NDArray
 
 from color_correction.constant.color_checker import reference_color_d50_bgr
-from color_correction.constant.methods import (
-    LiteralModelCorrection,
-    LiteralModelDetection,
-)
 from color_correction.core.card_detection.det_yv8_onnx import (
     YOLOv8CardDetector,
 )
 from color_correction.core.correction import CorrectionModelFactory
 from color_correction.processor.det_yv8 import DetectionProcessor
-from color_correction.schemas.images import ColorPatchType, ImageType
+from color_correction.schemas.custom_types import (
+    ColorPatchType,
+    ImageBGR,
+    LiteralModelCorrection,
+    LiteralModelDetection,
+)
 from color_correction.utils.image_patch import (
     create_patch_tiled_image,
     visualize_patch_comparison,
@@ -26,17 +26,18 @@ from color_correction.utils.visualization_utils import (
 
 
 class ColorCorrection:
-    """Color correction handler using color card detection and correction models.
-
+    """Color correction handler using color `card_detection` and `correction_models`.
     This class handles the complete workflow of color correction, including:
+
     - Color card detection in images
     - Color patch extraction
     - Color correction model training
     - Image correction application
+    - Evaluation of color correction patches
 
     Parameters
     ----------
-    detection_model : {'yolov8'}
+    detection_model : LiteralModelDetection, optional
         The model to use for color card detection.
     detection_conf_th : float, optional
         Confidence threshold for card detection.
@@ -58,11 +59,11 @@ class ColorCorrection:
 
     Attributes
     ----------
-    reference_patches : List[ColorPatchType] | None
+    reference_patches : list[ColorPatchType] | None
         Extracted color patches from reference image.
-    reference_grid_image : ImageType | None
+    reference_grid_image : ImageBGR | None
         Visualization of reference color patches in grid format.
-    reference_debug_image : ImageType | None
+    reference_debug_image : ImageBGR | None
         Debug visualization of reference image preprocessing.
     """
 
@@ -71,7 +72,7 @@ class ColorCorrection:
         detection_model: LiteralModelDetection = "yolov8",
         detection_conf_th: float = 0.25,
         correction_model: LiteralModelCorrection = "least_squares",
-        reference_image: ImageType | None = None,
+        reference_image: ImageBGR | None = None,
         use_gpu: bool = True,
         **kwargs: dict,
     ) -> None:
@@ -137,14 +138,14 @@ class ColorCorrection:
 
     def _extract_color_patches(
         self,
-        image: ImageType,
+        image: ImageBGR,
         debug: bool = False,
-    ) -> tuple[list[ColorPatchType], ImageType, ImageType | None]:
+    ) -> tuple[list[ColorPatchType], ImageBGR, ImageBGR | None]:
         """Extract color patches from an image using card detection.
 
         Parameters
         ----------
-        image : ImageType
+        image : ImageBGR
             Input image in BGR format.
         debug : bool, optional
             Whether to generate debug visualizations.
@@ -168,15 +169,15 @@ class ColorCorrection:
 
     def _save_debug_output(
         self,
-        input_image: ImageType,
-        corrected_image: ImageType,
+        input_image: ImageBGR,
+        corrected_image: ImageBGR,
         output_directory: str,
     ) -> None:
         """Save debug visualizations to disk.
 
         Parameters
         ----------
-        input_image : ImageType
+        input_image : ImageBGR
             The input image.
         corrected_image : ImageType
             The color-corrected image.
@@ -258,11 +259,13 @@ class ColorCorrection:
         -------
         tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]
             A tuple containing:
-            - reference_patches: The array representing the reference color patches.
-            - reference_grid_image: The array depicting
-                the grid layout of the reference patches.
-            - reference_debug_image: The array used for debugging
-                the color correction process.
+
+            - **self.reference_patches**: The array representing the reference
+            color patches.
+            - **self.reference_grid_image**: The array depicting the grid layout of
+            the reference patches.
+            - **self.reference_debug_image**: The array used for debugging the color
+            correction process.
         """
         return (
             self.reference_patches,
@@ -292,9 +295,11 @@ class ColorCorrection:
         -------
         None
             Sets the following instance attributes:
-            - reference_patches: Color values of reference patches
-            - reference_grid_image: Grid image of reference patches
-            - reference_debug_image: Debug visualization (only if debug=True and image provided)
+
+            - `self.reference_patches`: Color values of reference patches
+            - `self.reference_grid_image`: Grid image of reference patches
+            - `self.reference_debug_image`: Debug visualization (only if debug=True and image provided)
+
         """  # noqa: E501
         if image is None:
             self.reference_patches = reference_color_d50_bgr
@@ -323,19 +328,21 @@ class ColorCorrection:
         -------
         tuple
             Contains three elements:
-            - input_patches : np.ndarray
+
+            - `self.input_patches` : np.ndarray
                 Extracted color patches from the image
-            - input_grid_image : np.ndarray
+            - `self.input_grid_image` : np.ndarray
                 Visualization of the detected grid
-            - input_debug_image : np.ndarray
+            - `self.input_debug_image` : np.ndarray
                 Debug visualization (if debug=True)
 
         Notes
         -----
         The function will set class attributes:
-            - `self.input_patches`
-            - `self.input_grid_image`
-            - `self.input_debug_image`
+
+        - `self.input_patches`
+        - `self.input_grid_image`
+        - `self.input_debug_image`
 
         The function first resets these attributes to None before processing 🔄
         """
@@ -350,7 +357,7 @@ class ColorCorrection:
         ) = self._extract_color_patches(image=image, debug=debug)
         return self.input_patches, self.input_grid_image, self.input_debug_image
 
-    def fit(self) -> tuple[NDArray, list[ColorPatchType], list[ColorPatchType]]:
+    def fit(self) -> tuple[np.ndarray, list[ColorPatchType], list[ColorPatchType]]:
         """Fit color correction model using input and reference images.
 
         Parameters
@@ -362,7 +369,7 @@ class ColorCorrection:
 
         Returns
         -------
-        Tuple[np.ndarray, List[np.ndarray], List[np.ndarray]]
+        tuple[np.ndarray, list[np.ndarray], list[np.ndarray]]
             Correction weights, input patches, and reference patches.
         """
         if self.reference_patches is None:
@@ -386,15 +393,15 @@ class ColorCorrection:
 
     def predict(
         self,
-        input_image: ImageType,
+        input_image: ImageBGR,
         debug: bool = False,
         debug_output_dir: str = "output-debug",
-    ) -> ImageType:
+    ) -> ImageBGR:
         """Apply color correction to input image.
 
         Parameters
         ----------
-        input_image : ImageType
+        input_image : ImageBGR
             Image to be color corrected.
         debug : bool, optional
             Whether to save debug visualizations.
@@ -403,7 +410,7 @@ class ColorCorrection:
 
         Returns
         -------
-        ImageType
+        ImageBGR
             Color corrected image.
 
         Raises
@@ -428,6 +435,37 @@ class ColorCorrection:
         return corrected_image
 
     def calc_color_diff_patches(self) -> dict:
+        """
+        Calculate color difference metrics for image patches using the dE CIE 2000 metric.
+
+        This method computes the color differences between:
+
+          - The initial (uncorrected) input patches and the reference patches.
+          - The corrected patches and the reference patches.
+
+        It then calculates the delta as the difference between the initial and corrected color differences
+        (i.e., initial minus corrected) to assess the change in color discrepancy after correction.
+
+        Notes
+        -----
+        This function processes patches only, not whole images. The calculations compare the color differences
+        between patches before correction and patches after correction against the same reference patches.
+
+        Returns
+        -------
+        dict
+            A dictionary with the following keys:
+
+            - `initial`: dict containing the color difference metrics for the initial patches versus the reference.
+            - `corrected`: dict containing the color difference metrics for the corrected patches versus the reference.
+            - `delta`: dict with metrics representing the difference between the initial and corrected color differences.
+                      Each metric is computed as:
+                      ```python
+                        metric_delta = metric_initial - metric_corrected,
+                      ```
+                      where metrics include `min`, `max`, `mean`, and `std`.
+
+        """  # noqa: E501
         initial_color_diff = calc_color_diff(
             image1=self.input_grid_image,
             image2=self.reference_grid_image,
