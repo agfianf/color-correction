@@ -158,12 +158,6 @@ dependencies = [
     { name = "shapely" },
 ]
 
-[package.optional-dependencies]
-docs = [
-    { name = "mkdocs-material" },
-    { name = "mkdocstrings", extra = ["python"] },
-]
-
 [package.dev-dependencies]
 dev = [
     { name = "pre-commit" },
@@ -174,6 +168,10 @@ dev = [
 dev-model = [
     { name = "ultralytics" },
 ]
+docs = [
+    { name = "mkdocs-material" },
+    { name = "mkdocstrings", extra = ["python"] },
+]
 mccdet = [
     { name = "opencv-contrib-python" },
 ]
@@ -183,8 +181,6 @@ requires-dist = [
     { name = "colour-science", specifier = ">=0.4.6" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "matplotlib", specifier = ">=3.10.0" },
-    { name = "mkdocs-material", marker = "extra == 'docs'", specifier = ">=9.6.3" },
-    { name = "mkdocstrings", extras = ["python"], marker = "extra == 'docs'", specifier = ">=0.28.0" },
     { name = "onnx", specifier = ">=1.17.0" },
     { name = "onnxruntime", specifier = ">=1.20.1" },
     { name = "opencv-python-headless", specifier = ">=4.11.0.86" },
@@ -203,6 +199,10 @@ dev = [
     { name = "ruff", specifier = ">=0.9.2" },
 ]
 dev-model = [{ name = "ultralytics", specifier = ">=8.3.65" }]
+docs = [
+    { name = "mkdocs-material", specifier = ">=9.6.3" },
+    { name = "mkdocstrings", extras = ["python"], specifier = ">=0.28.0" },
+]
 mccdet = [{ name = "opencv-contrib-python", specifier = ">=4.11.0.86" }]
 
 [[package]]
