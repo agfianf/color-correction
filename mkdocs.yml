@@ -1,5 +1,6 @@
 site_name: color-correction
 repo_url: https://github.com/agfianf/color-correction
+repo_name: agfianf/color-correction
 extra:
   generator: false
 theme:
