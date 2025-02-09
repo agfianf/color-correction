@@ -1,16 +1,16 @@
-from enum import StrEnum
+from enum import Enum
 
 from pydantic import BaseModel, Field
 
 
-class GPUType(StrEnum):
+class GPUType(str, Enum):
     NVIDIA = "NVIDIA"
     AMD = "AMD"
     APPLE = "Apple Integrated"
     UNKNOWN = "Unknown GPU"
 
 
-class CPUArchitecture(StrEnum):
+class CPUArchitecture(str, Enum):
     INTEL = "Intel"
     AMD = "AMD"
     ARM = "ARM"
