@@ -10,23 +10,18 @@ from color_correction.schemas.device import (
 
 
 def detect_darwin(specs: dict[str, Any]) -> dict[str, Any]:
-    """Detect hardware specifications for macOS (Darwin).
+    """
+    Detect hardware specifications on macOS, including CPU and GPU details.
 
     Parameters
     ----------
     specs : dict
-        Base specifications dictionary with OS information.
+        Initial dictionary containing OS information.
 
     Returns
     -------
     dict
-        Updated specifications with CPU and GPU information.
-
-    Notes
-    -----
-    Detects:
-    1. Apple Silicon vs Intel via sysctl
-    2. GPU type (Apple/AMD/NVIDIA) via system_profiler
+        Updated dictionary with CPU architecture and GPU type for macOS.
     """
     try:
         cpu_info = subprocess.check_output(
@@ -58,23 +53,18 @@ def detect_darwin(specs: dict[str, Any]) -> dict[str, Any]:
 
 
 def detect_linux(specs: dict[str, Any]) -> dict[str, Any]:
-    """Detect hardware specifications for Linux.
+    """
+    Detect hardware specifications on Linux systems.
 
     Parameters
     ----------
     specs : dict
-        Base specifications dictionary with OS information.
+        Initial dictionary with OS information.
 
     Returns
     -------
     dict
-        Updated specifications with CPU and GPU information.
-
-    Notes
-    -----
-    Detects:
-    1. CPU architecture (ARM/x86_64) via lscpu
-    2. GPU type (NVIDIA/AMD) via nvidia-smi or lspci
+        Updated dictionary with CPU architecture and GPU type for Linux.
     """
     try:
         cpu_info = subprocess.check_output("lscpu", shell=True).decode().lower()
@@ -110,17 +100,18 @@ def detect_linux(specs: dict[str, Any]) -> dict[str, Any]:
 
 
 def detect_windows(specs: dict[str, Any]) -> dict[str, Any]:
-    """Detect hardware specifications for Windows.
+    """
+    Detect hardware specifications on Windows systems.
 
     Parameters
     ----------
     specs : dict
-        Base specifications dictionary with OS information.
+        Initial dictionary with OS information.
 
     Returns
     -------
     dict
-        Updated specifications with CPU and GPU information.
+        Updated dictionary with CPU architecture and GPU type for Windows.
     """
     proc = platform.processor().lower()
     if "intel" in proc:
@@ -137,12 +128,14 @@ def detect_windows(specs: dict[str, Any]) -> dict[str, Any]:
 
 
 def get_device_specs() -> DeviceSpecs:
-    """Get device hardware specifications.
+    """
+    Retrieve a structured set of device hardware specifications.
 
     Returns
     -------
     DeviceSpecs
-        Pydantic model containing device specifications.
+        An object containing OS name, CPU architecture, GPU type,
+        and Apple Silicon flag.
     """
     specs = {
         "os_name": platform.system(),

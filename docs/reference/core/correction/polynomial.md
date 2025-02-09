@@ -1,3 +1,3 @@
-# Documentation for `Polynomial`
+# `Polynomial` class
 
 ::: color_correction.core.correction.Polynomial

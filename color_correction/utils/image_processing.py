@@ -15,21 +15,22 @@ def crop_region_with_margin(
     coordinates: tuple[int, int, int, int],
     margin_ratio: float = 0.2,
 ) -> np.ndarray:
-    """Crop a region from image with additional margin from given coordinates.
+    """
+    Crop a sub-region from an image with an additional margin.
 
     Parameters
     ----------
     image : np.ndarray
-        Input image array of shape (H, W, C) or (H, W).
-    coordinates : np.ndarray
-        Bounding box coordinates [x1, y1, x2, y2].
+        The input image (H, W, C) or (H, W).
+    coordinates : tuple[int, int, int, int]
+        The bounding box defined as (x1, y1, x2, y2).
     margin_ratio : float, optional
-        Ratio of margin to add relative to region size, by default 0.2.
+        Ratio to determine the extra margin; default is 0.2.
 
     Returns
     -------
     np.ndarray
-        Cropped image region with margins.
+        The cropped image region including the margin.
     """
     y1, y2 = coordinates[1], coordinates[3]
     x1, x2 = coordinates[0], coordinates[2]
@@ -48,17 +49,18 @@ def crop_region_with_margin(
 
 
 def calc_mean_color_patch(img: np.ndarray) -> np.ndarray:
-    """Calculate mean RGB/BGR values across spatial dimensions.
+    """
+    Compute the mean color of an image patch across spatial dimensions.
 
     Parameters
     ----------
     img : np.ndarray
-        Input image array of shape (H, W, C).
+        The input image patch with shape (H, W, C).
 
     Returns
     -------
     np.ndarray
-        Array of mean RGB values, shape (C,), dtype uint8.
+        Array containing the mean color for each channel (dtype uint8).
     """
     return np.mean(img, axis=(0, 1)).astype(np.uint8)
 
@@ -67,18 +69,20 @@ def calc_color_diff(
     image1: ImageType,
     image2: ImageType,
 ) -> dict[str, float]:
-    """Calculate color difference metrics between two images.
+    """
+    Calculate color difference metrics between two images using CIE 2000.
 
     Parameters
     ----------
-    image1, image2 : NDArray
-        Images to compare in BGR format.
+    image1 : ImageType
+        First input image in BGR format.
+    image2 : ImageType
+        Second input image in BGR format.
 
     Returns
     -------
     dict[str, float]
-        Dictionary of color difference
-        keys: min, max, mean, std
+        Dictionary with keys 'min', 'max', 'mean', and 'std' for the color difference.
     """
     rgb1 = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
     rgb2 = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
@@ -100,7 +104,21 @@ def numpy_array_to_base64(
     arr: np.ndarray,
     convert_bgr_to_rgb: bool = True,
 ) -> str:
-    """Convert numpy array (image) to base64 string"""
+    """
+    Convert a numpy image array into a base64-encoded PNG string.
+
+    Parameters
+    ----------
+    arr : np.ndarray
+        Input image array.
+    convert_bgr_to_rgb : bool, optional
+        Whether to convert BGR to RGB before encoding; default is True.
+
+    Returns
+    -------
+    str
+        Base64-encoded image string prefixed with the appropriate data URI.
+    """
     if arr is None:
         return ""
 

@@ -35,59 +35,63 @@ pip install color-correction
 
 ## ⚡ How to use
 
-```python
-from color_correction import ColorCorrection
+=== "code"
 
-# Step 1: Define the path to the input image
-image_path = "asset/images/cc-19.png"
+    ```python
+    from color_correction import ColorCorrection
 
-# Step 2: Load the input image
-input_image = cv2.imread(image_path)
+    # Step 1: Define the path to the input image
+    image_path = "asset/images/cc-19.png"
 
-# Step 3: Initialize the color correction model with specified parameters
-color_corrector = ColorCorrection(
-    detection_model="yolov8",
-    detection_conf_th=0.25,
-    correction_model="polynomial", # "least_squares", "affine_reg", "linear_reg"
-    degree=3,  # for polynomial correction model
-    use_gpu=True,
-)
+    # Step 2: Load the input image
+    input_image = cv2.imread(image_path)
 
-# Step 4: Extract color patches from the input image
-# you can set reference patches from another image (image has color checker card)
-# or use the default D50
-# color_corrector.set_reference_patches(image=None, debug=True)
-color_corrector.set_input_patches(image=input_image, debug=True)
-color_corrector.fit()
-corrected_image = color_corrector.predict(
-    input_image=input_image,
-    debug=True,
-    debug_output_dir="zzz",
-)
+    # Step 3: Initialize the color correction model with specified parameters
+    color_corrector = ColorCorrection(
+        detection_model="yolov8",
+        detection_conf_th=0.25,
+        correction_model="polynomial", # "least_squares", "affine_reg", "linear_reg"
+        degree=3,  # for polynomial correction model
+        use_gpu=True,
+    )
 
-# Step 5: Evaluate the color correction results
-eval_result = color_corrector.calc_color_diff_patches()
-print(eval_result)
-```
+    # Step 4: Extract color patches from the input image
+    # you can set reference patches from another image (image has color checker card)
+    # or use the default D50
+    # color_corrector.set_reference_patches(image=None, debug=True)
+    color_corrector.set_input_patches(image=input_image, debug=True)
+    color_corrector.fit()
+    corrected_image = color_corrector.predict(
+        input_image=input_image,
+        debug=True,
+        debug_output_dir="zzz",
+    )
 
+    # Step 5: Evaluate the color correction results
+    eval_result = color_corrector.calc_color_diff_patches()
+    print(eval_result)
+    ```
 
-??? info "Sample Evaluation Output"
+=== "output evaluation"
 
     ```json
     {
         "initial": {
+            // dE values before correction (input patches vs reference)
             "min": 2.254003059526461,
             "max": 13.461066402633447,
             "mean": 8.3072755187654,
             "std": 3.123962754767539,
         },
         "corrected": {
+            // dE values after correction (input patches vs reference)
             "min": 0.30910031798755183,
             "max": 5.422311999126372,
             "mean": 1.4965478752947827,
             "std": 1.2915738724958112,
         },
         "delta": {
+            // dE values difference (initial vs corrected)
             "min": 1.9449027415389093,
             "max": 8.038754403507074,
             "mean": 6.810727643470616,
@@ -97,43 +101,46 @@ print(eval_result)
     ```
 
 
-??? info "Sample Output Debugging Image"
+=== "debugging image"
 
     ![Sample Output](assets/sample-output-debug.jpg)
 
 
 
 ## 🔎 Reporting
-```python
-import cv2
 
-from color_correction import ColorCorrectionAnalyzer
+=== "code"
 
-# input_image_path = "assets/cc-19.png"
-input_image_path = "assets/cc-1.jpg"
+    ```python
+    import cv2
 
-report = ColorCorrectionAnalyzer(
-    list_correction_methods=[
-        ("least_squares", {}),
-        ("linear_reg", {}),
-        ("affine_reg", {}),
-        ("polynomial", {"degree": 2}),
-        ("polynomial", {"degree": 3}),
-        # ("polynomial", {"degree": 4}),
-        # ("polynomial", {"degree": 5}),
-    ],
-    list_detection_methods=[
-        ("yolov8", {"detection_conf_th": 0.25}),
-    ],
-)
-report.run(
-    input_image=cv2.imread(input_image_path),
-    reference_image=None,
-    output_dir="report-output",
-)
-```
+    from color_correction import ColorCorrectionAnalyzer
 
-??? info "Sample Report Output"
+    # input_image_path = "assets/cc-19.png"
+    input_image_path = "assets/cc-1.jpg"
+
+    report = ColorCorrectionAnalyzer(
+        list_correction_methods=[
+            ("least_squares", {}),
+            ("linear_reg", {}),
+            ("affine_reg", {}),
+            ("polynomial", {"degree": 2}),
+            ("polynomial", {"degree": 3}),
+            # ("polynomial", {"degree": 4}),
+            # ("polynomial", {"degree": 5}),
+        ],
+        list_detection_methods=[
+            ("yolov8", {"detection_conf_th": 0.25}),
+        ],
+    )
+    report.run(
+        input_image=cv2.imread(input_image_path),
+        reference_image=None,
+        output_dir="report-output",
+    )
+    ```
+
+=== "report output"
 
     ![Sample Benchmark Output](assets/sample-benchmark.png)
 

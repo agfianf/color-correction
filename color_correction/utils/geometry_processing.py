@@ -8,6 +8,24 @@ def get_max_iou_shapely(
     ref_box: shapely.geometry.box,
     target_boxes: list[shapely.geometry.box],
 ) -> tuple[float, int, shapely.geometry.box]:
+    """
+    Find the target box with the highest IoU compared to a reference box.
+
+    Parameters
+    ----------
+    ref_box : shapely.geometry.box
+        The reference bounding box.
+    target_boxes : list of shapely.geometry.box
+        List of candidate boxes.
+
+    Returns
+    -------
+    tuple
+        A tuple containing:
+        - Maximum IoU (float)
+        - Index of the box with the maximum IoU (int)
+        - The corresponding target box (shapely.geometry.box)
+    """
     max_iou = 0
     max_idx = -1
 
@@ -29,16 +47,54 @@ def get_max_iou_shapely(
 
 
 def box_to_xyxy(box: shapely.geometry.box) -> tuple[int, int, int, int]:
-    """Convert shapely box to xyxy format"""
+    """
+    Convert a Shapely box to (x1, y1, x2, y2) format.
+
+    Parameters
+    ----------
+    box : shapely.geometry.box
+        Input Shapely box.
+
+    Returns
+    -------
+    tuple[int, int, int, int]
+        Coordinates in (x1, y1, x2, y2) format.
+    """
     minx, miny, maxx, maxy = box.bounds
     return int(minx), int(miny), int(maxx), int(maxy)
 
 
 def box_centroid_xy(box: shapely.geometry.box) -> tuple[int, int]:
+    """
+    Get the centroid coordinates of a Shapely box.
+
+    Parameters
+    ----------
+    box : shapely.geometry.box
+        Input Shapely box.
+
+    Returns
+    -------
+    tuple[int, int]
+        Coordinates of the centroid (x, y).
+    """
     return int(box.centroid.x), int(box.centroid.y)
 
 
 def generate_expected_patches(card_box: box_tuple) -> list[box_tuple]:
+    """
+    Generate a grid of expected patch coordinates within a card box.
+
+    Parameters
+    ----------
+    card_box : tuple[int, int, int, int]
+        Coordinates of the card in (x1, y1, x2, y2) format.
+
+    Returns
+    -------
+    list[box_tuple]
+        List of patch coordinates arranged in a grid.
+    """
     card_x1, card_y1, card_x2, card_y2 = card_box
     card_width = card_x2 - card_x1
     card_height = card_y2 - card_y1
@@ -63,6 +119,21 @@ def extract_intersecting_patches(
     ls_patches: list[box_tuple],
     ls_grid_card: list[box_tuple],
 ) -> list[tuple[box_tuple, tuple[int, int]]]:
+    """
+    Extract patches that intersect with each grid card and compute centroids.
+
+    Parameters
+    ----------
+    ls_patches : list[box_tuple]
+        List of detected patch coordinates.
+    ls_grid_card : list[box_tuple]
+        List of grid card coordinates.
+
+    Returns
+    -------
+    list[tuple[box_tuple, tuple[int, int]]]
+        Each element is a tuple of the intersecting patch coordinates and its centroid.
+    """
     ls_ordered_patch = []
     for _, grid_card in enumerate(ls_grid_card, start=1):
         # get intesect patch
@@ -89,6 +160,19 @@ def extract_intersecting_patches(
 
 
 def calculate_patch_statistics(ls_ordered_patch: list[box_tuple]) -> tuple:
+    """
+    Calculate mean differences in positions and sizes for patches.
+
+    Parameters
+    ----------
+    ls_ordered_patch : list[box_tuple]
+        List of patch coordinates.
+
+    Returns
+    -------
+    tuple
+        A tuple containing mean dx, mean dy, mean width, and mean height.
+    """
     ls_dx = []
     ls_dy = []
     ls_w_grid = []
@@ -126,6 +210,20 @@ def calculate_patch_statistics(ls_ordered_patch: list[box_tuple]) -> tuple:
 def suggest_missing_patch_coordinates(  # noqa: C901
     ls_ordered_patch: list[box_tuple],
 ) -> dict[int, box_tuple]:
+    """
+    Suggest coordinates for missing patches based on neighboring patches.
+
+    Parameters
+    ----------
+    ls_ordered_patch : list[box_tuple]
+        List of ordered patch coordinates (with None for missing patches).
+
+    Returns
+    -------
+    dict[int, box_tuple]
+        A dictionary where keys are indices of missing patches and values
+        are the suggested coordinates.
+    """
     d_suggest = {}
 
     mean_dx, mean_dy, mean_w, mean_h = calculate_patch_statistics(

@@ -19,7 +19,20 @@ class CPUArchitecture(str, Enum):
 
 
 class DeviceSpecs(BaseModel):
-    """Device specifications schema."""
+    """
+    Device specifications schema.
+
+    Attributes
+    ----------
+    os_name : str
+        Operating system name.
+    cpu_arch : CPUArchitecture
+        CPU architecture.
+    gpu_type : GPUType
+        GPU type.
+    is_apple_silicon : bool
+        Whether the device is Apple Silicon.
+    """
 
     os_name: str = Field(..., description="Operating system name")
     cpu_arch: CPUArchitecture = Field(

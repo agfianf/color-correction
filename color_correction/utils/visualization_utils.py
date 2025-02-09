@@ -12,25 +12,26 @@ def create_image_grid_visualization(
     dpi: int = 300,
 ) -> matplotlib.figure.Figure:
     """
-    Display images in a grid layout with titles
+    Create a grid visualization of images with optional saving.
 
-    Parameters:
-    -----------
-    images : List[Tuple[str, Union[np.ndarray, matplotlib.figure.Figure, None]]]
-        List of tuples containing (title, image)
-    grid_size : Tuple[int, int]
-        Grid layout in (rows, columns) format
-    figsize : Tuple[int, int]
-        Size of the entire figure in inches
-    save_path : Optional[str]
-        If provided, save the figure to this path
-    dpi : int
-        DPI for saved figure
+    Parameters
+    ----------
+    images : list of tuple
+        List where each tuple contains (title, image) and image can be a numpy array,
+        a matplotlib Figure, or None.
+    grid_size : tuple[int, int], optional
+        Tuple of (rows, columns) defining the grid layout; default is (2, 3).
+    figsize : tuple[int, int], optional
+        Size of the matplotlib figure in inches; default is (15, 10).
+    save_path : str | None, optional
+        File path to save the figure; if None, the figure is not saved.
+    dpi : int, optional
+        Dots per inch for the saved image; default is 300.
 
-    Returns:
-    --------
+    Returns
+    -------
     matplotlib.figure.Figure
-        The figure object containing the grid
+        The created matplotlib figure containing the image grid.
     """
 
     rows, cols = grid_size

@@ -10,19 +10,18 @@ from color_correction.utils.device_info import get_device_specs
 
 def download_google_drive_file(file_id: str, output_file: str) -> None:
     """
-    Download a file from Google Drive using its file ID.
+    Download a file from Google Drive using a file ID.
 
     Parameters
     ----------
     file_id : str
-        The unique ID of the file on Google Drive.
+        Unique identifier of the file on Google Drive.
     output_file : str
-        The name of the output file where the content will be saved.
+        Local path where the downloaded file will be saved.
 
     Returns
     -------
     None
-        Downloads the file and saves it locally.
     """
     url: Final = f"https://drive.google.com/uc?export=download&id={file_id}"
 
@@ -51,6 +50,19 @@ def download_google_drive_file(file_id: str, output_file: str) -> None:
 
 
 def downloader_model_yolov8(use_gpu: bool = False) -> str:
+    """
+    Download the appropriate YOLOv8 model based on device specifications.
+
+    Parameters
+    ----------
+    use_gpu : bool, optional
+        Flag indicating whether to use a GPU model; default is False.
+
+    Returns
+    -------
+    str
+        The file path to the downloaded YOLOv8 model.
+    """
     specs = get_device_specs()
     model_folder = os.path.join(os.getcwd(), "tmp", "models")
     if use_gpu:

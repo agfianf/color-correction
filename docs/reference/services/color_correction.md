@@ -1,3 +1,3 @@
-# Documentation for `ColorCorrection`
+# `ColorCorrection` class
 
 ::: color_correction.ColorCorrection

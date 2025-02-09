@@ -1,3 +1,3 @@
-# Documentation for `ColorCorrectionAnalyzer`
+# `ColorCorrectionAnalyzer` class
 
 ::: color_correction.ColorCorrectionAnalyzer

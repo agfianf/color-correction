@@ -19,3 +19,12 @@ log:
 
 update-uv-lock:
 	uv lock
+
+list-installed:
+	uv pip list
+
+sync-docs:
+	uv sync --only-group={docs,dev}
+
+sync-all:
+	uv sync --all-groups  --no-group dev-model
