@@ -1,0 +1,158 @@
+site_name: color-correction
+extra:
+  generator: false
+theme:
+  name: 'material'
+  language: en
+  logo: 'assets/logo-v1.png'
+  favicon: 'assets/logo-v1.png'
+  font:
+    text: 'Plus Jakarta Sans'
+    code: 'Fira Code'
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+      primary: 1F69E9
+      accent: grey
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to system preference
+      primary: 1F69E9
+      accent: white
+  icon:
+    admonition:
+      note: fontawesome/solid/note-sticky
+      abstract: fontawesome/solid/book
+      info: fontawesome/solid/circle-info
+      tip: fontawesome/solid/bullhorn
+      success: fontawesome/solid/check
+      question: fontawesome/solid/circle-question
+      warning: fontawesome/solid/triangle-exclamation
+      failure: fontawesome/solid/bomb
+      danger: fontawesome/solid/skull
+      bug: fontawesome/solid/robot
+      example: fontawesome/solid/flask
+      quote: fontawesome/regular/file-code
+
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tabs
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - search.suggest
+    - content.code.copy
+    - content.code.annotate
+
+markdown_extensions:
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - attr_list
+  - md_in_html
+  - pymdownx.blocks.caption
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.superfences:
+      custom_fences:
+      - name: mermaid
+        class: mermaid
+        format: !!python/name:pymdownx.superfences.fence_code_format
+  - toc:
+      permalink: "¤"
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]  # actually not needed, default
+          options:
+            filters:
+              - "!^_" # ignore objects starting with an underscore
+              - "^__" # ignore objects starting with a double underscore
+
+            # docstrings
+            docstring_style: numpy
+            docstring_section_style: table
+            show_if_no_docstring: false
+            show_docstring_classes: true
+            show_docstring_attributes: true
+            show_docstring_functions: true
+            show_docstring_modules: true
+            show_docstring_examples: true
+            show_docstring_other_parameters: true
+            show_docstring_parameters: true
+            show_docstring_raises: true
+            show_docstring_receives: true
+            show_docstring_returns: true
+            show_docstring_warns: true
+            show_docstring_yields: true
+
+            # signature
+            annotations_path: source # source, brief, full
+            line_length: 79
+            separate_signature: true
+            show_signature_annotations: true
+
+            # general
+            show_source: true
+
+            # headings
+            parameter_headings: false
+            show_bases: false
+            show_root_heading: true
+            show_root_full_path: false
+            show_root_toc_entry: false
+            show_root_members_full_path: false
+            show_object_full_path: false
+            group_by_category: true
+            show_category_heading: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+
+            # members
+            members_order: source
+            show_submodules: true
+            show_labels: true
+
+nav:
+  - Home: index.md
+  - Tutorial: tutorials.md
+  - Reference:
+      - Core:
+        - Card Detection:
+          - YoloV8 ONNX: reference/core/card_detection/yv8_onnx.md
+        - Correction:
+          - Least Squares: reference/core/correction/least_squares.md
+          - Linear Regression: reference/core/correction/linear_reg.md
+          - Affine Regression: reference/core/correction/affine_reg.md
+          - Polynomial: reference/core/correction/polynomial.md
+      - Services:
+        - Color Correction: reference/services/color_correction.md
+        - Correction Analyzer: reference/services/correction_analyzer.md

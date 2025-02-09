@@ -10,6 +10,13 @@ from color_correction.utils.correction import (
 
 
 class LeastSquaresRegression(BaseComputeCorrection):
+    """
+    Apply a least squares regression for color correction.
+
+    This class computes a color correction transformation by solving the least squares
+    problem to find the best fit coefficients.
+    """
+
     def __init__(self) -> None:
         self.model = None
 
@@ -18,6 +25,21 @@ class LeastSquaresRegression(BaseComputeCorrection):
         x_patches: np.ndarray,  # input patches
         y_patches: np.ndarray,  # reference patches
     ) -> np.ndarray:
+        """
+        Fit the least squares regression model using input and reference patches.
+
+        Parameters
+        ----------
+        x_patches : np.ndarray
+            Array of input patches.
+        y_patches : np.ndarray
+            Array of reference patches.
+
+        Returns
+        -------
+        np.ndarray
+            The matrix of coefficients obtained from the least squares solution.
+        """
         start_time = time.perf_counter()
 
         self.model = np.linalg.lstsq(
@@ -31,6 +53,24 @@ class LeastSquaresRegression(BaseComputeCorrection):
         return self.model
 
     def compute_correction(self, input_image: np.ndarray) -> np.ndarray:
+        """
+        Compute the color-corrected image using the fitted least squares model.
+
+        Parameters
+        ----------
+        input_image : np.ndarray
+            The input image represented as an array of color values.
+
+        Returns
+        -------
+        np.ndarray
+            The color-corrected output image.
+
+        Raises
+        ------
+        ValueError
+            If the model has not been fitted before calling this method.
+        """
         if self.model is None:
             raise ValueError("Model is not fitted yet. Please call fit() method first.")
 

@@ -14,12 +14,52 @@ from color_correction.utils.yolo_utils import (
 
 
 class YOLOv8CardDetector(BaseCardDetector):
-    """YOLOv8CardDetector is a class that implements card detection
-    using the YOLOv8 model.
+    """YOLOv8CardDetector is a class that implements card detection using the YOLOv8
+    model.
 
-    Reference
-    ---------
-    https://github.com/ibaiGorordo/ONNX-YOLOv8-Object-Detection/blob/main/yolov8/YOLOv8.py
+    This class provides functionality to detect cards in images using a YOLOv8 model
+    implemented with ONNX runtime. It handles model initialization, image preprocessing,
+    inference, and post-processing of detection results.
+
+    Parameters
+    ----------
+    conf_th : float, optional
+        Confidence threshold for filtering detections, by default 0.15
+    iou_th : float, optional
+        Intersection over Union threshold for non-maximum suppression, by default 0.7
+    path : str or None, optional
+        Path to the ONNX model file.
+        If None, downloads the default model, by default None
+    use_gpu : bool, optional
+        Whether to use GPU for inference, by default False
+
+    Attributes
+    ----------
+    conf_threshold : float
+        Threshold for filtering detections based on confidence scores
+    iou_threshold : float
+        Threshold for non-maximum suppression
+    use_gpu : bool
+        Flag indicating whether to use GPU for inference
+    session : onnxruntime.InferenceSession
+        ONNX Runtime session for model inference
+    input_names : list
+        Names of model input nodes
+    output_names : list
+        Names of model output nodes
+    input_shape : tuple
+        Shape of the input tensor
+    input_height : int
+        Height of the input image required by the model
+    input_width : int
+        Width of the input image required by the model
+    scale_to_ori : float
+        Scale factor to map predictions back to original image size
+
+    Methods
+    -------
+    detect(image)
+        Detect cards in the input image and return detection results
 
     """
 

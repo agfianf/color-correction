@@ -12,8 +12,10 @@ repos:
     rev: v5.0.0
     hooks:
       - id: check-added-large-files
+        args: ['--maxkb=1024']  # 1MB = 1024KB
       - id: check-toml
       - id: check-yaml
+        exclude: ^mkdocs\.yml$
       - id: detect-private-key
       - id: end-of-file-fixer
         exclude: ^LICENSE|VERSION$

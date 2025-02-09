@@ -50,6 +50,12 @@ class ColorCorrection:
     **kwargs : dict
         Additional parameters for the correction model.
 
+    Other parameters
+    ----------------
+    degree : int, optional
+        Degree of `polynomial` correction model. Default is 2.
+        the more degree, the more complex the model. (e.g. 2, 3, 4, ...)
+
     Attributes
     ----------
     reference_patches : List[ColorPatchType] | None
@@ -233,12 +239,31 @@ class ColorCorrection:
 
     @property
     def model_name(self) -> str:
-        "Return the name of the correction model."
+        """
+        Return the name of the correction model.
+
+        Returns
+        -------
+        str
+            The name of the correction model class.
+        """
         return self.correction_model.__class__.__name__
 
     @property
     def ref_patches(self) -> np.ndarray:
-        """Return grid image of reference color patches."""
+        """
+        Return grid image of reference color patches.
+
+        Returns
+        -------
+        tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]
+            A tuple containing:
+            - reference_patches: The array representing the reference color patches.
+            - reference_grid_image: The array depicting
+                the grid layout of the reference patches.
+            - reference_debug_image: The array used for debugging
+                the color correction process.
+        """
         return (
             self.reference_patches,
             self.reference_grid_image,
@@ -250,6 +275,27 @@ class ColorCorrection:
         image: np.ndarray | None,
         debug: bool = False,
     ) -> None:
+        """Set reference patches for color correction.
+
+        This function sets up reference color patches either from a default set of D50 BGR values
+        or by extracting patches from a provided reference image.
+
+        Parameters
+        ----------
+        image : np.ndarray | None
+            Input reference image from which to extract color patches.
+            If None, uses default D50 BGR reference values.
+        debug : bool, default=False
+            If True, generates additional debug visualization.
+
+        Returns
+        -------
+        None
+            Sets the following instance attributes:
+            - reference_patches: Color values of reference patches
+            - reference_grid_image: Grid image of reference patches
+            - reference_debug_image: Debug visualization (only if debug=True and image provided)
+        """  # noqa: E501
         if image is None:
             self.reference_patches = reference_color_d50_bgr
             self.reference_grid_image = create_patch_tiled_image(self.reference_patches)
@@ -261,6 +307,38 @@ class ColorCorrection:
             ) = self._extract_color_patches(image=image, debug=debug)
 
     def set_input_patches(self, image: np.ndarray, debug: bool = False) -> None:
+        """
+        This function processes an input image to extract color patches and generates
+        corresponding grid and debug visualizations 🔍
+
+
+        Parameters
+        ----------
+        image : np.ndarray
+            Input image to extract color patches from 📸
+        debug : bool, optional
+            If True, generates additional debug visualization, by default False 🐛
+
+        Returns
+        -------
+        tuple
+            Contains three elements:
+            - input_patches : np.ndarray
+                Extracted color patches from the image
+            - input_grid_image : np.ndarray
+                Visualization of the detected grid
+            - input_debug_image : np.ndarray
+                Debug visualization (if debug=True)
+
+        Notes
+        -----
+        The function will set class attributes:
+            - `self.input_patches`
+            - `self.input_grid_image`
+            - `self.input_debug_image`
+
+        The function first resets these attributes to None before processing 🔄
+        """
         self.input_patches = None
         self.input_grid_image = None
         self.input_debug_image = None
@@ -277,14 +355,14 @@ class ColorCorrection:
 
         Parameters
         ----------
-        input_image : NDArray
-            Image BGR to be corrected that contains color checker classic 24 patches.
-        reference_image : NDArray, optional
-            Image BGR to be reference that contains color checker classic 24 patches.
+        input_image : np.ndarray
+            Image `BGR` to be corrected that contains color checker classic 24 patches.
+        reference_image : np.ndarray, optional
+            Image `BGR` to be reference that contains color checker classic 24 patches.
 
         Returns
         -------
-        Tuple[NDArray, List[NDArray], List[NDArray]]
+        Tuple[np.ndarray, List[np.ndarray], List[np.ndarray]]
             Correction weights, input patches, and reference patches.
         """
         if self.reference_patches is None:
