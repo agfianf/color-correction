@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.0.1-rc1] - 2025-02-10
+**Release Candidate with Full Feature Set and Documentation**
+- Add docs page build with mkdocs-material. Read more [https://agfianf.github.io/color-correction/](https://agfianf.github.io/color-correction/)
+- Complete docstrings for all classes and methods
+
 ## [v0.0.1b3] - 2025-02-06
 **Add Analyzer Report and Bug Fixes**
 
