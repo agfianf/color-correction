@@ -1,5 +1,13 @@
 # Changelog
 
+## [v0.0.1-rc2] - 2025-02-10
+**Release Candidate with Full Feature Set and Documentation**
+This release introduces several improvements:
+
+- Updated documentation to include interactive Google Colab demos and online documentation links.
+- Refactored the detection module by renaming the detection file and introducing the new `DetectionProcessor` class for clearer structure.
+- Enhanced image processing utilities with improved docstrings and comments for better code readability and maintainability.
+
 ## [v0.0.1-rc1] - 2025-02-10
 **Release Candidate with Full Feature Set and Documentation**
 - Add docs page build with mkdocs-material. Read more [https://agfianf.github.io/color-correction/](https://agfianf.github.io/color-correction/)
