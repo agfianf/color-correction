@@ -98,7 +98,7 @@ plugins:
           options:
             filters:
               - "!^_" # ignore objects starting with an underscore
-              - "^__" # ignore objects starting with a double underscore
+              - "!^__" # ignore objects starting with a double underscore
 
             # docstrings
             docstring_style: numpy
