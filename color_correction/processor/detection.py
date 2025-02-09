@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+from color_correction.schemas.custom_types import BoundingBox, ColorPatchType, ImageBGR
 from color_correction.schemas.det_yv8 import DetectionResult
 from color_correction.utils.geometry_processing import (
     extract_intersecting_patches,
@@ -12,18 +13,13 @@ from color_correction.utils.image_processing import (
     crop_region_with_margin,
 )
 
-# Type aliases for better readability
-BoundingBox = tuple[int, int, int, int]
-RGB = tuple[float, float, float]
-BGR = tuple[float, float, float]
-
 
 class DetectionProcessor:
     """
-    A class to process color calibration card detections and extract color patches.
-
-    This class handles the detection and processing of color calibration cards and their
-    individual color patches, including visualization and RGB value extraction.
+    A class for processing detection results and transforming them using
+    available utility methods. This class takes the output from an object
+    detection model (e.g., YOLOv8) and provides functionality to separate,
+    process, and visualize detected color checker cards and their patches.
     """
 
     @staticmethod
@@ -31,17 +27,20 @@ class DetectionProcessor:
         prediction: DetectionResult,
     ) -> tuple[list[BoundingBox], list[BoundingBox]]:
         """
-        Separate detection boxes by class (cards and patches).
+        Separates detection boxes into card boxes and patch boxes.
 
         Parameters
         ----------
         prediction : DetectionResult
-            Detection results containing boxes and class IDs
+            The detection output that includes bounding boxes and class IDs.
 
         Returns
         -------
-        Tuple[List[BoundingBox], List[BoundingBox]]
-            Two lists containing card boxes and patch boxes respectively
+        tuple[list[BoundingBox], list[BoundingBox]]
+            A tuple containing:
+
+            - a list of card boxes (class id 1)
+            - a list of patch boxes (class id 0).
         """
         ls_cards = [
             box
@@ -66,12 +65,12 @@ class DetectionProcessor:
     @staticmethod
     def print_summary(prediction: DetectionResult) -> None:
         """
-        Print a summary of detected objects.
+        Prints a summary of the detected cards and patches.
 
         Parameters
         ----------
         prediction : DetectionResult
-            Detection results to summarize
+            The detection result to summarize.
         """
         ls_cards, ls_patches = DetectionProcessor.get_each_class_box(prediction)
         print(f"Number of cards detected: {len(ls_cards)}")
@@ -79,23 +78,28 @@ class DetectionProcessor:
 
     @staticmethod
     def process_patches(
-        input_image: np.ndarray,
+        input_image: ImageBGR,
         ordered_patches: list[tuple[BoundingBox, tuple[int, int]] | None],
-    ) -> tuple[list[RGB], np.ndarray]:
+    ) -> tuple[list[ColorPatchType], ImageBGR]:
         """
-        Process detected patches to extract RGB values and create a visualization.
+        Processes each detected patch by extracting its region from the image,
+        computing its mean BGR color, and building a visualization grid.
 
         Parameters
         ----------
-        input_image : np.ndarray
-            Input image containing the patches
-        ordered_patches : List[Optional[BoundingBox]]
-            List of ordered patch coordinates
+        input_image : ImageBGR
+            The original image containing detected patches.
+        ordered_patches : list[tuple[BoundingBox, tuple[int, int]] | None]
+            The list of ordered patch coordinates paired with their center
+            points, possibly with missing entries as None.
 
         Returns
         -------
-        Tuple[List[RGB], np.ndarray]
-            List of RGB values and visualization image
+        tuple[list[ColorPatchType], ImageBGR]
+            a tuple containing:
+
+            - list of mean BGR color values for each patch.
+            - an image visualizing these patches in a grid layout.
         """
         patch_size = (50, 50, 1)
         ls_bgr_mean_patch = []
@@ -129,31 +133,42 @@ class DetectionProcessor:
 
     @staticmethod
     def extract_color_patches(
-        input_image: np.ndarray,
+        input_image: ImageBGR,
         prediction: DetectionResult,
         draw_processed_image: bool = False,
-    ) -> tuple[list[BGR], np.ndarray, np.ndarray | None]:
+    ) -> tuple[list[ColorPatchType], ImageBGR, ImageBGR | None]:
         """
-        Extract and process color patches from the detected calibration card.
+        Extracts and processes color patches from detected color checker cards,
+        transforming the detection results with available methods.
+
+        The method first separates detected cards and patches, generates an expected
+        patch grid, and then matches the detected patches with this grid. If patches
+        are missing, it attempts to auto-fill them with suggested coordinates.
+        Finally, it computes the mean color for each patch and builds a visualization.
 
         Parameters
         ----------
-        input_image : np.ndarray
-            Input image containing the color calibration card
+        input_image : ImageBGR
+            The original image containing the color checker card.
         prediction : DetectionResult
-            Detection results from YOLOv8
+            The detection result output from the model.
         draw_processed_image : bool, optional
-            Whether to create a visualization image, by default False
+            If True, returns an additional image with visualized detections.
+            Otherwise, only patch processing is performed. Defaults to False.
 
         Returns
         -------
-        Tuple[List[BGR], np.ndarray, Optional[np.ndarray]]
-            BGR values, patch visualization, and optional detection visualization
+        tuple[list[ColorPatchType], ImageBGR, ImageBGR | None]
+            a tuple containing:
+
+            - a list of mean BGR color values for each patch.
+            - an image visualizing these patches in a grid layout.
+            - an optional image with visualized detection results.
 
         Raises
         ------
         ValueError
-            If no cards or patches are detected
+            If no cards or patches are detected.
         """
         ls_cards, ls_patches = DetectionProcessor.get_each_class_box(prediction)
 
@@ -206,30 +221,34 @@ class DetectionProcessor:
 
     @staticmethod
     def draw_preprocess(
-        image: np.ndarray,
+        image: ImageBGR,
         expected_boxes: list[BoundingBox],
         prediction: DetectionResult,
         ls_ordered_patch_bbox: list[BoundingBox | None],
         suggested_patches: dict[int, BoundingBox] | None = None,
-    ) -> np.ndarray:
+    ) -> ImageBGR:
         """
-        Draw detection visualizations on the image.
+        Draws visualizations on the input image to compare the detected patches with
+        the expected positions. It overlays expected boxes, connects detected patches to
+        their corresponding expected boxes, and highlights individual patch detections.
 
         Parameters
         ----------
-        image : np.ndarray
-            Input image to draw on
-        boxes : List[BoundingBox]
-            List of bounding boxes to draw
-        patch_indices : Optional[List[int]]
-            Indices to label the patches
-        suggested_patches : Optional[Dict[int, BoundingBox]]
-            Additional suggested patch locations to draw
+        image : ImageBGR
+            The original image to draw on.
+        expected_boxes : list[BoundingBox]
+            List of expected bounding boxes for patches.
+        prediction : DetectionResult
+            The detection results containing predicted bounding boxes.
+        ls_ordered_patch_bbox : list[BoundingBox | None]
+            The list of ordered patch bounding boxes.
+        suggested_patches : dict[int, BoundingBox], optional
+            Dictionary of suggested patch coordinates for missing patches.
 
         Returns
         -------
-        np.ndarray
-            Image with visualizations
+        ImageBGR
+            The image with drawn detection and patch visualizations.
         """
         color_green = (0, 255, 0)
         color_cyan = (255, 255, 10)
@@ -249,7 +268,7 @@ class DetectionProcessor:
                 thickness=2,
             )
 
-            # draw connection lines between expected and intersecting patches
+            # Draw connection lines between expected and detected patch boxes
             patch = ls_ordered_patch_bbox[idx_b]
             if patch is None:
                 continue
@@ -263,7 +282,7 @@ class DetectionProcessor:
                 thickness=1,
             )
 
-        # draw all predicted boxes
+        # Draw all predicted boxes
         for pbox, pids, pscore in zip(
             prediction.boxes,
             prediction.class_ids,

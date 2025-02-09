@@ -20,14 +20,13 @@ class DetectionResult(BaseModel):
     A data model that encapsulates YOLOv8 detection results for a standardized color
     card and its color patches. The model handles two distinct classes:
     patches (label 0) and card (label 1). In a typical detection scenario,
-    the model captures one color calibration card and 24 color patches.
-
+    the model captures one card and 24 color patches inside/outside the card.
 
     Notes
     -----
     The detection typically yields 25 objects:
 
-    - 1 calibration card (class_id: 1)
+    - 1 color checker card 24 Patches (class_id: 1)
     - 24 color patches (class_id: 0)
 
     Attributes
@@ -38,7 +37,7 @@ class DetectionResult(BaseModel):
         Class identifiers for each detected object where:
 
         - 0: represents color patches
-        - 1: represents the calibration card
+        - 1: represents the color checker card 24 Patches
 
     scores : list[float]
         List of confidence scores for each detection.

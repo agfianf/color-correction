@@ -131,7 +131,7 @@ class ReportGenerator:
 
     def save_dataframe(self, df: pd.DataFrame, filepath: str) -> None:
         """
-        Save a DataFrame to a file using pickle format.
+        Save a DataFrame to a file using the pickle format.
 
         Parameters
         ----------
@@ -139,5 +139,10 @@ class ReportGenerator:
             The DataFrame to be saved.
         filepath : str
             Output file path.
+
+        Notes
+        -----
+        The DataFrame will be saved in a binary format using pickle
+        at the specified file path.
         """
         df.to_pickle(filepath)

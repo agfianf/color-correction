@@ -2,7 +2,7 @@ import numpy as np
 
 
 def create_patch_tiled_image(
-    ls_patches: list[tuple[int, int, int, int]],
+    ls_patches: list[tuple[int, int, int]],
     patch_size: tuple[int, int, int] = (50, 50, 1),
 ) -> np.ndarray:
     """Generate a color patch image from a list of BGR values.
@@ -13,10 +13,10 @@ def create_patch_tiled_image(
 
     Parameters
     ----------
-    ls_patches : list of tuple
+    ls_patches : list[tuple[int, int, int]]
         List containing 24 BGR color tuples, where each tuple has three integers
         representing (B, G, R) values.
-    patch_size : tuple of int, optional
+    patch_size : tuple[int, int, int], optional
         Size of each individual patch in pixels, by default (50, 50, 1).
         Format is (height, width, channels).
 
@@ -67,13 +67,13 @@ def visualize_patch_comparison(
 
     Parameters
     ----------
-    ls_mean_ref : list of np.ndarray
+    ls_mean_ref : np.ndarray
         List of outer image patches. Each patch is repeated to form the full
         grid background.
-    ls_mean_in : list of np.ndarray
+    ls_mean_in : np.ndarray
         List of inner image patches meant to be resized and placed into the
         center of the outer patches.
-    patch_size : tuple of int, optional
+    patch_size : tuple[int, int, int]t, optional
         A tuple specifying the size of the patch in the format (height, width, channels)
         by default (100, 100, 1).
 
