@@ -5,12 +5,16 @@ on:
     branches: [ main ]
     paths-ignore:
       - '**.md'
+      - '*.md'
+      - '**.js'
+      - '**.html'
+      - '**.css'
       - 'docs/**'
       - 'LICENSE'
       - '.gitignore'
       - '.pre-commit-config.yaml'
       - 'mkdocs.yml'
-      - 'docs_requirements.txt'
+      - 'CHANGELOG.md'
 
 jobs:
   test:
