@@ -1,4 +1,5 @@
 site_name: color-correction
+repo_url: https://github.com/agfianf/color-correction
 extra:
   generator: false
 theme:
@@ -28,6 +29,7 @@ theme:
       primary: 1F69E9
       accent: white
   icon:
+    repo: fontawesome/brands/square-github
     admonition:
       note: fontawesome/solid/note-sticky
       abstract: fontawesome/solid/book
