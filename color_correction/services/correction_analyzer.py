@@ -16,12 +16,43 @@ from color_correction.utils.report_generator import ReportGenerator
 
 
 class ColorCorrectionAnalyzer:
+    """
+    Analyzer for benchmarking color correction methods.
+
+    This class combines multiple correction and detection techniques to analyze
+    the performance of color correction models by comparing patches and overall image
+    differences.
+
+    Parameters
+    ----------
+    list_correction_methods : list of tuple[LiteralModelCorrection, dict]
+        A list of tuples, where each tuple contains a correction method identifier
+        and its parameters.
+    list_detection_methods : list of tuple[LiteralModelDetection, dict]
+        A list of tuples, where each tuple contains a detection method identifier
+        and its parameters.
+    use_gpu : bool, optional
+        Flag to indicate whether GPU is used, by default True.
+    """
+
     def __init__(
         self,
         list_correction_methods: list[tuple[LiteralModelCorrection, dict]],
         list_detection_methods: list[tuple[LiteralModelDetection, dict]],
         use_gpu: bool = True,
     ) -> None:
+        """
+        Initialize the ColorCorrectionAnalyzer.
+
+        Parameters
+        ----------
+        list_correction_methods : list of tuple[LiteralModelCorrection, dict]]
+            List of correction methods and their parameters.
+        list_detection_methods : list of tuple[LiteralModelDetection, dict]]
+            List of detection methods and their parameters.
+        use_gpu : bool, optional
+            Whether to use GPU acceleration, by default True.
+        """
         self.list_correction_methods = list_correction_methods
         self.list_detection_methods = list_detection_methods
         self.use_gpu = use_gpu
@@ -37,6 +68,31 @@ class ColorCorrectionAnalyzer:
         cc_params: dict,
         reference_image: np.ndarray | None = None,
     ) -> dict:
+        """
+        Run a single experiment for a given detection and correction method.
+
+        Parameters
+        ----------
+        idx : int
+            Index of the experiment.
+        input_image : np.ndarray
+            The input image array.
+        det_method : LiteralModelDetection
+            The detection method identifier.
+        det_params : dict
+            Parameters for the detection method.
+        cc_method : LiteralModelCorrection
+            The correction method identifier.
+        cc_params : dict
+            Parameters for the correction method.
+        reference_image : np.ndarray, optional
+            The reference image, by default None.
+
+        Returns
+        -------
+        dict
+            A dictionary containing evaluation data and results of the experiment.
+        """
         cc = ColorCorrection(
             correction_model=cc_method,
             detection_model=det_method,
@@ -100,8 +156,43 @@ class ColorCorrectionAnalyzer:
         reference_image: np.ndarray | None = None,
     ) -> pd.DataFrame:
         """
-        Fungsi ini menjalankan benchmark untuk model color correction.
-        """
+        Run the full benchmark for color correction and generate reports.
+
+        Parameters
+        ----------
+        input_image : np.ndarray
+            The image to be processed.
+        output_dir : str, optional
+            The directory to save reports, by default "benchmark_debug".
+        reference_image : np.ndarray, optional
+            Optional reference image used for evaluation, by default None.
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame containing results of all experiments.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from color_correction.services.correction_analyzer import ColorCorrectionAnalyzer
+        >>>
+        >>> # Assume input_image is a numpy array of shape (H, W, C)
+        >>> input_image = np.random.rand(100, 100, 3)
+        >>> analyzer = ColorCorrectionAnalyzer(
+        ...     list_correction_methods=[
+        ...         ("least_squares", {}),
+        ...         ("linear_reg", {}),
+        ...         ("affine_reg", {}),
+        ...         ("polynomial", {"degree": 2})
+        ...         ("polynomial", {"degree": 3})
+        ...         ("polynomial", {"degree": 4})
+        ...     ],
+        ...     list_detection_methods=[("yolov8", {"detection_conf_th": 0.25})],
+        ... )
+        >>> results = analyzer.run(input_image=input_image, output_dir="output")
+        >>> print(results.head())
+        """  # noqa: E501
         ls_data = []
         idx = 1
         for det_method, det_params in self.list_detection_methods:
@@ -145,6 +236,7 @@ class ColorCorrectionAnalyzer:
 
         print("DataFrame shape:", df_results.shape)
         print("\nDataFrame columns:", df_results.columns.tolist())
+        return df_results
 
 
 if __name__ == "__main__":
