@@ -8,7 +8,7 @@ from color_correction.core.card_detection.det_yv8_onnx import (
     YOLOv8CardDetector,
 )
 from color_correction.core.correction import CorrectionModelFactory
-from color_correction.processor.det_yv8 import DetectionProcessor
+from color_correction.processor.detection import DetectionProcessor
 from color_correction.schemas.custom_types import (
     ColorPatchType,
     ImageBGR,
@@ -153,6 +153,7 @@ class ColorCorrection:
         Returns
         -------
         tuple[list[ColorPatchType], ImageType, ImageType | None]
+
             - List of BGR mean values for each detected patch
             - Grid visualization of detected patches
             - Debug visualization (if debug=True)

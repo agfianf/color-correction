@@ -15,6 +15,13 @@
     <a href="https://badge.fury.io/py/color-correction">
         <img src="https://img.shields.io/pypi/pyversions/color-correction" alt="python version" />
     </a>
+    <a href="https://colab.research.google.com/drive/146SXHHihMmGLzaTSwdBXncVr3SU_I-Dm?usp=sharing">
+        <img src="https://img.shields.io/badge/Try_color--correction_using-Google_Colab-blue?logo=googlecolab" alt="Try color-correction using - Google Colab" />
+    </a>
+    <a href="https://agfianf.github.io/color-correction/">
+        <img src="https://img.shields.io/badge/read-docs-blue?logo=materialformkdocs" alt="read - docs" />
+    </a>
+
 </p>
 
 !!! warning "Disclaimer"

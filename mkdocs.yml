@@ -164,6 +164,8 @@ nav:
           - Linear Regression: reference/core/correction/linear_reg.md
           - Affine Regression: reference/core/correction/affine_reg.md
           - Polynomial: reference/core/correction/polynomial.md
+      - processor:
+        - detection: reference/processor/detection.md
       - services:
         - color_correction: reference/services/color_correction.md
         - correction_analyzer: reference/services/correction_analyzer.md

@@ -10,7 +10,8 @@
 [![version](https://badge.fury.io/py/color-correction.svg)](https://badge.fury.io/py/color-correction)
 [![downloads](https://img.shields.io/pypi/dm/color-correction)](https://pypistats.org/packages/color-correction)
 [![python-version](https://img.shields.io/pypi/pyversions/color-correction)](https://badge.fury.io/py/color-correction)
-
+[![Try color-correction using - Google Colab](https://img.shields.io/badge/Try_color--correction_using-Google_Colab-blue?logo=googlecolab)](https://colab.research.google.com/drive/146SXHHihMmGLzaTSwdBXncVr3SU_I-Dm?usp=sharing)
+[![read - docs](https://img.shields.io/badge/read-docs-blue?logo=materialformkdocs)](https://agfianf.github.io/color-correction/)
 
 </div>
 

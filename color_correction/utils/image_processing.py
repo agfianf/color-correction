@@ -4,10 +4,9 @@ import io
 import colour as cl
 import cv2
 import numpy as np
-from numpy.typing import NDArray
 from PIL import Image
 
-ImageType = NDArray[np.uint8]
+from color_correction.schemas.custom_types import ImageBGR
 
 
 def crop_region_with_margin(
@@ -66,17 +65,17 @@ def calc_mean_color_patch(img: np.ndarray) -> np.ndarray:
 
 
 def calc_color_diff(
-    image1: ImageType,
-    image2: ImageType,
+    image1: ImageBGR,
+    image2: ImageBGR,
 ) -> dict[str, float]:
     """
     Calculate color difference metrics between two images using CIE 2000.
 
     Parameters
     ----------
-    image1 : ImageType
+    image1 : ImageBGR
         First input image in BGR format.
-    image2 : ImageType
+    image2 : ImageBGR
         Second input image in BGR format.
 
     Returns
