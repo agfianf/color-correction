@@ -9,6 +9,14 @@ This package has built-in support for detecting card patches in an image. This f
 
 === "Code"
 
+    ??? tip "If you don't have image to test"
+
+        You can download the sample image from the following link:
+        ```bash
+        curl -L -o input_image.jpg "https://drive.google.com/uc?export=download&id=1syOqw9kC0tt01p7yEobU4MeLfh336DZA"
+        ```
+
+
     ```python
     import cv2
 
