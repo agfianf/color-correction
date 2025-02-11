@@ -19,6 +19,7 @@ The analyzer automatically runs all defined methods and generates a comprehensiv
         ```
 
     ```python
+    # your_script.py
     import cv2
 
     from color_correction import ColorCorrectionAnalyzer
