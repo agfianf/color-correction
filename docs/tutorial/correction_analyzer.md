@@ -39,12 +39,16 @@ The analyzer automatically runs all defined methods and generates a comprehensiv
         list_detection_methods=[
             ("yolov8", {"detection_conf_th": 0.25}),
         ],
+        use_gpu=False,
     )
-    report.run(
+
+    df_report = report.run(
         input_image=cv2.imread(input_image_path),
         reference_image=None,
         output_dir="report-output", # (1)
     )
+
+    df_report.head()
     ```
 
     1. 💬 The output directory where the report files will be saved.

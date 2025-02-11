@@ -32,14 +32,14 @@ class ColorCorrectionAnalyzer:
         A list of tuples, where each tuple contains a detection method identifier
         and its parameters.
     use_gpu : bool, optional
-        Flag to indicate whether GPU is used, by default True.
+        Flag to indicate whether GPU is used, by default False.
     """
 
     def __init__(
         self,
         list_correction_methods: list[tuple[LiteralModelCorrection, dict]],
         list_detection_methods: list[tuple[LiteralModelDetection, dict]],
-        use_gpu: bool = True,
+        use_gpu: bool = False,
     ) -> None:
         """
         Initialize the ColorCorrectionAnalyzer.
@@ -243,8 +243,7 @@ class ColorCorrectionAnalyzer:
             ],
         ).to_csv(os.path.join(output_dir, "report_no_image.csv"), index=False)
 
-        print("DataFrame shape:", df_results.shape)
-        print("\nDataFrame columns:", df_results.columns.tolist())
+        print(f"Report saved to {html_report_path}")
         return df_results
 
 

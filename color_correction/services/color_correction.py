@@ -47,8 +47,8 @@ class ColorCorrection:
     reference_image : NDArray[np.uint8] | None, optional
         Reference image containing color checker card.
         If None, uses standard D50 values.
-    use_gpu : bool, default=True
-        Whether to use GPU for card detection. False will use CPU.
+    use_gpu : bool, default=False
+        True to use GPU for card detection. False will use CPU.
     **kwargs : dict
         Additional parameters for the correction model.
 
@@ -74,7 +74,7 @@ class ColorCorrection:
         detection_conf_th: float = 0.25,
         correction_model: LiteralModelCorrection = "least_squares",
         reference_image: ImageBGR | None = None,
-        use_gpu: bool = True,
+        use_gpu: bool = False,
         **kwargs: dict,
     ) -> None:
         # Initialize reference image attributes
