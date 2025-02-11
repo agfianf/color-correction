@@ -41,6 +41,7 @@ Issues = "https://github.com/agfianf/color-correction/issues"
 
 [dependency-groups]
 docs = [
+    "mkdocs-glightbox>=0.4.0",
     "mkdocs-material>=9.6.3",
     "mkdocstrings[python]>=0.28.0",
 ]

@@ -99,6 +99,7 @@ markdown_extensions:
 
 plugins:
   - search
+  - glightbox
   - mkdocstrings:
       handlers:
         python:
@@ -154,7 +155,11 @@ plugins:
 
 nav:
   - Home: index.md
-  - Tutorial: tutorials.md
+  - Tutorial:
+    - Getting Started: tutorial/getting_started.md
+    - Color Correction: tutorial/color_correction.md
+    - Correction Analyzer: tutorial/correction_analyzer.md
+    - Detector: tutorial/detect_card.md
   - Reference:
       - core:
         - card_detection:
