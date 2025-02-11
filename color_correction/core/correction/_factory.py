@@ -8,7 +8,10 @@ from color_correction.core.correction.polynomial import Polynomial
 
 class CorrectionModelFactory:
     @staticmethod
-    def create(model_name: str, **kwargs: dict) -> ...:
+    def create(
+        model_name: str,
+        **kwargs: dict,
+    ) -> LeastSquaresRegression | Polynomial | LinearRegression | AffineRegression:
         model_registry = {
             "least_squares": LeastSquaresRegression(),
             "polynomial": Polynomial(**kwargs),

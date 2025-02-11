@@ -14,6 +14,7 @@ from color_correction.schemas.custom_types import (
     ImageBGR,
     LiteralModelCorrection,
     LiteralModelDetection,
+    TrainedCorrection,
 )
 from color_correction.utils.image_patch import (
     create_patch_tiled_image,
@@ -46,8 +47,8 @@ class ColorCorrection:
     reference_image : NDArray[np.uint8] | None, optional
         Reference image containing color checker card.
         If None, uses standard D50 values.
-    use_gpu : bool, default=True
-        Whether to use GPU for card detection. False will use CPU.
+    use_gpu : bool, default=False
+        True to use GPU for card detection. False will use CPU.
     **kwargs : dict
         Additional parameters for the correction model.
 
@@ -73,7 +74,7 @@ class ColorCorrection:
         detection_conf_th: float = 0.25,
         correction_model: LiteralModelCorrection = "least_squares",
         reference_image: ImageBGR | None = None,
-        use_gpu: bool = True,
+        use_gpu: bool = False,
         **kwargs: dict,
     ) -> None:
         # Initialize reference image attributes
@@ -235,12 +236,12 @@ class ColorCorrection:
         """
         os.makedirs(base_dir, exist_ok=True)
         run_number = len(os.listdir(base_dir)) + 1
-        run_dir = os.path.join(base_dir, f"{run_number}-{self.model_name}")
+        run_dir = os.path.join(base_dir, f"{run_number}-{self.correction_model_name}")
         os.makedirs(run_dir, exist_ok=True)
         return run_dir
 
     @property
-    def model_name(self) -> str:
+    def correction_model_name(self) -> str:
         """
         Return the name of the correction model.
 
@@ -252,7 +253,7 @@ class ColorCorrection:
         return self.correction_model.__class__.__name__
 
     @property
-    def ref_patches(self) -> np.ndarray:
+    def reference_attr(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Return grid image of reference color patches.
 
@@ -273,6 +274,22 @@ class ColorCorrection:
             self.reference_grid_image,
             self.reference_debug_image,
         )
+
+    @property
+    def input_attr(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Return grid image of input color patches.
+
+        Returns
+        -------
+        tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]
+            A tuple containing:
+
+            - **self.input_patches**: The array representing the input color patches.
+            - **self.input_grid_image**: The array depicting the grid layout of the input patches.
+            - **self.input_debug_image**: The array used for debugging the color correction process.
+        """  # noqa: E501
+        return self.input_patches, self.input_grid_image, self.input_debug_image
 
     def set_reference_patches(
         self,
@@ -358,20 +375,36 @@ class ColorCorrection:
         ) = self._extract_color_patches(image=image, debug=debug)
         return self.input_patches, self.input_grid_image, self.input_debug_image
 
-    def fit(self) -> tuple[np.ndarray, list[ColorPatchType], list[ColorPatchType]]:
-        """Fit color correction model using input and reference images.
+    def fit(self) -> TrainedCorrection:
+        """
+        Fit the color correction model using the input and reference patches.
 
-        Parameters
-        ----------
-        input_image : np.ndarray
-            Image `BGR` to be corrected that contains color checker classic 24 patches.
-        reference_image : np.ndarray, optional
-            Image `BGR` to be reference that contains color checker classic 24 patches.
+        This method validates that both input and reference patches are set
+        and then fits the correction model. It computes the corrected patches
+        from the input patches and generates a grid image from these patches.
+        The resulting trained model is returned.
 
         Returns
         -------
-        tuple[np.ndarray, list[np.ndarray], list[np.ndarray]]
-            Correction weights, input patches, and reference patches.
+        TrainedCorrection
+            The trained color correction model.
+
+        Raises
+        ------
+        RuntimeError
+            If the reference patches or input patches are not set.
+
+        Notes
+        -----
+        The method computes the correction for the patches grid and saves it in
+        `self.corrected_patches` and the generated grid image in
+        `self.corrected_grid_image` for further use.
+
+        Warnings
+        --------
+        Ensure that the reference and input patches are set using
+        the methods `set_reference_patches()` and `set_input_patches()` respectively
+        before calling this method.
         """
         if self.reference_patches is None:
             raise RuntimeError("Reference patches must be set before fitting model")

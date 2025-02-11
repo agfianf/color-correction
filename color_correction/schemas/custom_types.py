@@ -27,12 +27,19 @@ ImageGray : numpy.typing.NDArray[np.uint8]
 BoundingBox : tuple[int, int, int, int]
     Represents a bounding box as (x1, y1, x2, y2).
     The top-left and bottom-right corners of the detection.
+MatrixWeightLeastSquare : numpy.typing.NDArray[np.float64]
+    Represents the matrix of weights for the least squares regression.
+TrainedCorrection : MatrixWeightLeastSquare | LinearRegression | Pipeline
+    Represents the trained model for color correction.
+
 """
 
 from typing import Literal
 
 import numpy as np
 from numpy.typing import NDArray
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import Pipeline
 
 LiteralModelCorrection = Literal[
     "least_squares",
@@ -49,3 +56,6 @@ ImageBGR = NDArray[np.uint8]
 ImageRGB = NDArray[np.uint8]
 ImageGray = NDArray[np.uint8]
 BoundingBox = tuple[int, int, int, int]
+MatrixWeightLeastSquare = NDArray[np.float64]
+
+TrainedCorrection = MatrixWeightLeastSquare | LinearRegression | Pipeline

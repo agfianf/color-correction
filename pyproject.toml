@@ -1,6 +1,6 @@
 [project]
 name = "color-correction"
-version = "0.0.1-rc2"
+version = "0.0.1-rc3"
 description = "help to do color correction on images based on color checker card classic 24 patch."
 keywords = ["color correction", "color-correction", "color consistency", "color-consistency", "vision", "computer vision"]
 readme = "README.md"
@@ -41,6 +41,7 @@ Issues = "https://github.com/agfianf/color-correction/issues"
 
 [dependency-groups]
 docs = [
+    "mkdocs-glightbox>=0.4.0",
     "mkdocs-material>=9.6.3",
     "mkdocstrings[python]>=0.28.0",
 ]
