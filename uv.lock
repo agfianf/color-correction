@@ -142,7 +142,7 @@ wheels = [
 
 [[package]]
 name = "color-correction"
-version = "0.0.1rc2"
+version = "0.0.1rc3"
 source = { editable = "." }
 dependencies = [
     { name = "colour-science" },
