@@ -12,8 +12,8 @@ This is the main feature of this package. Its capture to color correct an image 
 
 ## Limitations
 
-- The color correction model is only applicable to images with a color checker card.
-- The color correction model is not suitable for images with different camera settings (e.g., white balance, exposure, etc.) and environmental conditions (e.g., lighting conditions).
+- Training color correction model is only applicable to images with a color checker card inside the image.
+- The trained color correction model is not suitable for images with different camera settings (e.g., white balance, exposure, etc.) and environmental conditions (e.g., lighting conditions).
 
 
 ## Usage
