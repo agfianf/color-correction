@@ -102,7 +102,7 @@ class ColorCorrectionAnalyzer:
         )
 
         if reference_image is not None:
-            cc.set_reference_image(reference_image)
+            cc.set_reference_patches(reference_image)
         cc.set_input_patches(input_image, debug=True)
         cc.fit()
         corrected_image = cc.predict(input_image=input_image)
