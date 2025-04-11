@@ -191,10 +191,7 @@ class DetectionProcessor:
         d_suggest = None
         if None in ls_ordered_patch_bbox:
             print("Auto filling missing patches...")
-            ls_ordered_bbox_only = [
-                patch[0] if patch is not None else None
-                for patch in ls_ordered_patch_bbox
-            ]
+            ls_ordered_bbox_only = [patch[0] if patch is not None else None for patch in ls_ordered_patch_bbox]
             d_suggest = suggest_missing_patch_coordinates(ls_ordered_bbox_only)
             for idx, patch in d_suggest.items():
                 cxpatch = (patch[0] + patch[2]) // 2
