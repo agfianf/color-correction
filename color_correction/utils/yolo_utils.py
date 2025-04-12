@@ -166,6 +166,49 @@ def xywh2xyxy(x: np.ndarray) -> np.ndarray:
 
 
 # Visualization Functions
+def draw_segmentation(
+    image: np.ndarray,
+    segments: list[tuple[int, int]],
+    scores: list[float],
+    class_ids: list[int],
+    mask_alpha: float = DEFAULT_MASK_ALPHA,  # noqa: ARG001
+) -> np.ndarray:
+    """
+    Draw segmentation polygons on an image.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        The original image.
+    segments : list[list[int]]
+        List of segmentation points in (x, y) format.
+    scores : list[float]
+        Confidence scores for every box.
+    class_ids : list[int]
+        Class IDs corresponding to each detection.
+    mask_alpha : float, optional
+        Transparency of the drawn mask, default is DEFAULT_MASK_ALPHA.
+
+    Returns
+    -------
+    np.ndarray
+        The image with the polygon drawn on it.
+    """
+    for class_id, segment, score in zip(class_ids, segments, scores, strict=False):
+        color = COLORS[class_id]
+        cv2.polylines(image, [np.int32(segment)], True, color, 2)
+
+        draw_text(
+            image,
+            f"{class_names[class_id]} {int(score * 100)}%",
+            segment[0],
+            color,
+            font_size=0.001,
+            text_thickness=2,
+        )
+    return image
+
+
 def draw_detections(
     image: np.ndarray,
     boxes: list[list[int]],

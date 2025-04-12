@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from color_correction.schemas.custom_types import BoundingBox, ColorPatchType, ImageBGR
+from color_correction.schemas.custom_types import BoundingBox, ColorPatchType, ImageBGR, SegmentPoint
 from color_correction.schemas.det_yv8 import DetectionResult
 from color_correction.utils.geometry_processing import (
     extract_intersecting_patches,
@@ -11,6 +11,7 @@ from color_correction.utils.geometry_processing import (
 from color_correction.utils.image_processing import (
     calc_mean_color_patch,
     crop_region_with_margin,
+    crop_segment_straighten,
 )
 
 
@@ -25,7 +26,7 @@ class DetectionProcessor:
     @staticmethod
     def get_each_class_box(
         prediction: DetectionResult,
-    ) -> tuple[list[BoundingBox], list[BoundingBox]]:
+    ) -> tuple[list[BoundingBox | SegmentPoint], list[BoundingBox | SegmentPoint]]:
         """
         Separates detection boxes into card boxes and patch boxes.
 
@@ -36,30 +37,51 @@ class DetectionProcessor:
 
         Returns
         -------
-        tuple[list[BoundingBox], list[BoundingBox]]
+        tuple[list[BoundingBox | SegmentPoint], list[BoundingBox | SegmentPoint]]
             A tuple containing:
 
             - a list of card boxes (class id 1)
             - a list of patch boxes (class id 0).
         """
-        ls_cards = [
-            box
-            for box, class_id in zip(
-                prediction.boxes,
-                prediction.class_ids,
-                strict=False,
-            )
-            if class_id == 1
-        ]
-        ls_patches = [
-            box
-            for box, class_id in zip(
-                prediction.boxes,
-                prediction.class_ids,
-                strict=False,
-            )
-            if class_id == 0
-        ]
+
+        if prediction.boxes is not None:
+            ls_cards = [
+                box
+                for box, class_id in zip(
+                    prediction.boxes,
+                    prediction.class_ids,
+                    strict=False,
+                )
+                if class_id == 1
+            ]
+            ls_patches = [
+                box
+                for box, class_id in zip(
+                    prediction.boxes,
+                    prediction.class_ids,
+                    strict=False,
+                )
+                if class_id == 0
+            ]
+        if prediction.segment is not None:
+            ls_cards = [
+                segment
+                for segment, class_id in zip(
+                    prediction.segment,
+                    prediction.class_ids,
+                    strict=False,
+                )
+                if class_id == 1
+            ]
+            ls_patches = [
+                segment
+                for segment, class_id in zip(
+                    prediction.segment,
+                    prediction.class_ids,
+                    strict=False,
+                )
+                if class_id == 0
+            ]
         return ls_cards, ls_patches
 
     @staticmethod
@@ -177,7 +199,103 @@ class DetectionProcessor:
         if not ls_patches:
             raise ValueError("No patches detected")
 
-        # Generate expected patch grid
+        ls_bgr_mean_patch, grid_patch_img, detection_viz = None, None, None
+        if prediction.segment is not None:
+            print("Using segmentation results")
+            ls_bgr_mean_patch, grid_patch_img, detection_viz = DetectionProcessor.extract_patches_from_segment(
+                input_image,
+                prediction,
+                draw_processed_image,
+                ls_cards,
+                ls_patches,
+            )
+            print(f"grid_patch_img shape: {grid_patch_img}")
+
+        if prediction.boxes is not None:
+            print("Using box results")
+            ls_bgr_mean_patch, grid_patch_img, detection_viz = DetectionProcessor.extract_patches_from_boxes(
+                input_image,
+                prediction,
+                draw_processed_image,
+                ls_cards,
+                ls_patches,
+            )
+        return ls_bgr_mean_patch, grid_patch_img, detection_viz
+
+    @staticmethod
+    def extract_patches_from_segment(
+        input_image: ImageBGR,
+        prediction: DetectionResult,  # noqa: ARG004
+        draw_processed_image: bool,
+        ls_cards: list[SegmentPoint],
+        ls_patches: list[SegmentPoint],
+    ) -> tuple[list[ColorPatchType], ImageBGR, ImageBGR | None]:
+        patch_size = (50, 50, 1)
+        ls_bgr_mean_segment = []
+        ls_horizontal_patch = []
+        ls_vertical_patch = []
+
+        # we assume that white patch is bottom left, before this we need to arrange the patches
+        for idx, segment in enumerate(ls_patches, start=1):
+            cropped_segment = crop_segment_straighten(image=input_image, segment=segment)
+            bgr_mean_segment = calc_mean_color_patch(cropped_segment)
+            ls_bgr_mean_segment.append(bgr_mean_segment)
+
+            # Build visualization
+            patch_viz = np.tile(bgr_mean_segment, patch_size)  # Updated to use bgr_mean_segment
+            ls_horizontal_patch.append(patch_viz)
+            if idx % 6 == 0:
+                ls_vertical_patch.append(np.hstack(ls_horizontal_patch))
+                ls_horizontal_patch = []
+
+        image_det_viz = None
+        grid_patch_img = None
+
+        if draw_processed_image:
+            image_det_viz = input_image.copy()
+            # draw cards
+            for idx, card in enumerate(ls_cards):
+                random_color = (np.random.randint(0, 255), np.random.randint(0, 255), np.random.randint(0, 255))
+                # draw card
+                cv2.polylines(image_det_viz, [np.int32(card)], True, random_color, 2)
+                # draw text
+                cv2.putText(
+                    image_det_viz,
+                    str(idx) + " card",
+                    (int(card[0][0]), int(card[0][1]) - 4),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    random_color,
+                    2,
+                )
+
+            # draw patches
+            for idx, group_patch in enumerate(ls_patches):
+                random_color = (np.random.randint(0, 255), np.random.randint(0, 255), np.random.randint(0, 255))
+                # draw patch
+                cv2.polylines(image_det_viz, [np.int32(group_patch)], True, random_color, 2)
+                # draw text
+                cv2.putText(
+                    image_det_viz,
+                    str(idx),
+                    (int(group_patch[0][0]), int(group_patch[0][1]) - 4),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    random_color,
+                    2,
+                )
+
+            grid_patch_img = np.vstack(ls_vertical_patch)
+        return ls_bgr_mean_segment, grid_patch_img, image_det_viz
+
+    @staticmethod
+    def extract_patches_from_boxes(
+        input_image: np.ndarray,
+        prediction: DetectionResult,
+        draw_processed_image: bool,
+        ls_cards: list[BoundingBox],
+        ls_patches: list[BoundingBox],
+    ) -> tuple[list[ColorPatchType], ImageBGR, ImageBGR | None]:
         card_box = ls_cards[0]
         ls_grid_card = generate_expected_patches(card_box)
 

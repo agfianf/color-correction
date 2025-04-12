@@ -48,7 +48,7 @@ LiteralModelCorrection = Literal[
     "affine_reg",
 ]
 
-LiteralModelDetection = Literal["yolov8"]
+LiteralModelDetection = Literal["yolov8", "mcc"]
 
 ColorPatchType = NDArray[np.uint8]
 ImageType = NDArray[np.uint8]
@@ -56,6 +56,7 @@ ImageBGR = NDArray[np.uint8]
 ImageRGB = NDArray[np.uint8]
 ImageGray = NDArray[np.uint8]
 BoundingBox = tuple[int, int, int, int]
+SegmentPoint = list[tuple[int, int]]
 MatrixWeightLeastSquare = NDArray[np.float64]
 
 TrainedCorrection = MatrixWeightLeastSquare | LinearRegression | Pipeline
