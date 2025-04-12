@@ -1,6 +1,6 @@
 [project]
 name = "color-correction"
-version = "0.0.1-rc3"
+version = "0.0.1-rc4"
 description = "help to do color correction on images based on color checker card classic 24 patch."
 keywords = ["color correction", "color-correction", "color consistency", "color-consistency", "vision", "computer vision"]
 readme = "README.md"
@@ -13,16 +13,16 @@ maintainers = [
 requires-python = ">=3.10"
 dependencies = [
     "httpx>=0.28.1",
-    "pydantic>=2.10.5",
-    "pydantic-settings>=2.7.1",
-    "shapely>=2.0.6",
+    "pydantic>=2.10.6",
+    "pydantic-settings>=2.8.1",
+    "shapely>=2.0.7",
     "colour-science>=0.4.6",
     "scikit-learn>=1.6.1",
-    "matplotlib>=3.10.0",
-    "opencv-python-headless>=4.11.0.86",
-    "onnx>=1.17.0",
-    "onnxruntime>=1.20.1",
-    "pandas>=2.2.3",
+    "matplotlib>=3.10.1",
+    "onnx==1.17.0",
+    "onnxruntime==1.20.1",
+    "pandas==2.2.3",
+    "opencv-contrib-python>=4.11.0.86",
 ]
 classifiers = [
     'Programming Language :: Python :: 3 :: Only',
@@ -41,9 +41,9 @@ Issues = "https://github.com/agfianf/color-correction/issues"
 
 [dependency-groups]
 docs = [
-    "mkdocs-glightbox>=0.4.0",
-    "mkdocs-material>=9.6.3",
-    "mkdocstrings[python]>=0.28.0",
+    "mkdocs-glightbox==0.4.0",
+    "mkdocs-material==9.6.9",
+    "mkdocstrings[python]==0.29.0",
 ]
 
 mccdet = [
@@ -51,12 +51,12 @@ mccdet = [
 ]
 dev = [
     "pytest-cov==6.0.0",
-    "pytest>=8.3.4",
-    "ruff>=0.9.2",
-    "pre-commit>=4.1.0",
+    "pytest==8.3.5",
+    "ruff==0.11.2",
+    "pre-commit==4.2.0",
 ]
 dev-model = [
-    "ultralytics>=8.3.65",
+    "ultralytics==8.3.96",
 ]
 
 
@@ -118,7 +118,7 @@ exclude = [
     "tests",
 ]
 
-line-length = 88
+line-length = 120
 indent-width = 4
 respect-gitignore = true
 fix = true

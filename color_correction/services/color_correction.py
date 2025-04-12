@@ -4,9 +4,8 @@ import cv2
 import numpy as np
 
 from color_correction.constant.color_checker import reference_color_d50_bgr
-from color_correction.core.card_detection.det_yv8_onnx import (
-    YOLOv8CardDetector,
-)
+from color_correction.core.card_detection.det_yv8_onnx import YOLOv8CardDetector
+from color_correction.core.card_detection.mcc_det import MCCardDetector
 from color_correction.core.correction import CorrectionModelFactory
 from color_correction.processor.detection import DetectionProcessor
 from color_correction.schemas.custom_types import (
@@ -111,7 +110,7 @@ class ColorCorrection:
         model_name: str,
         conf_th: float = 0.25,
         use_gpu: bool = False,
-    ) -> YOLOv8CardDetector:
+    ) -> YOLOv8CardDetector | MCCardDetector:
         """Create a card detector instance.
 
         Parameters
@@ -125,7 +124,7 @@ class ColorCorrection:
 
         Returns
         -------
-        YOLOv8CardDetector
+        YOLOv8CardDetector | MCCardDetector
             Initialized detector instance.
 
         Raises
@@ -133,8 +132,10 @@ class ColorCorrection:
         ValueError
             If the model name is not supported.
         """
-        if model_name != "yolov8":
+        if model_name not in ["yolov8", "mcc"]:
             raise ValueError(f"Unsupported detection model: {model_name}")
+        if model_name == "mcc":
+            return MCCardDetector(use_gpu=use_gpu, conf_th=conf_th)
         return YOLOv8CardDetector(use_gpu=use_gpu, conf_th=conf_th)
 
     def _extract_color_patches(
@@ -160,12 +161,10 @@ class ColorCorrection:
             - Debug visualization (if debug=True)
         """
         prediction = self.card_detector.detect(image=image)
-        ls_bgr_mean_patch, grid_patch_img, debug_detection_viz = (
-            DetectionProcessor.extract_color_patches(
-                input_image=image,
-                prediction=prediction,
-                draw_processed_image=debug,
-            )
+        ls_bgr_mean_patch, grid_patch_img, debug_detection_viz = DetectionProcessor.extract_color_patches(
+            input_image=image,
+            prediction=prediction,
+            draw_processed_image=debug,
         )
         return ls_bgr_mean_patch, grid_patch_img, debug_detection_viz
 
@@ -323,6 +322,7 @@ class ColorCorrection:
             self.reference_patches = reference_color_d50_bgr
             self.reference_grid_image = create_patch_tiled_image(self.reference_patches)
         else:
+            print("Extracting color patches from reference image", image.shape)
             (
                 self.reference_patches,
                 self.reference_grid_image,
@@ -500,6 +500,13 @@ class ColorCorrection:
                       where metrics include `min`, `max`, `mean`, and `std`.
 
         """  # noqa: E501
+        # check input_grid_image, reference_grid_image, corrected_grid_image
+        print(
+            f"input_grid_image: {self.input_grid_image.shape}, "
+            f"reference_grid_image: {self.reference_grid_image.shape}, "
+            f"corrected_grid_image: {self.corrected_grid_image.shape}",
+        )
+
         initial_color_diff = calc_color_diff(
             image1=self.input_grid_image,
             image2=self.reference_grid_image,

@@ -47,6 +47,70 @@ def crop_region_with_margin(
     return image[crop_y1:crop_y2, crop_x1:crop_x2]
 
 
+def crop_segment_straighten(image: np.ndarray, segment: list[tuple[int, int]]) -> np.ndarray:
+    """
+    Straighten and crop a quadrilateral region from an image.
+
+    This function takes a quadrilateral defined by four corner points and transforms
+    it into a rectangular image by applying a perspective transformation.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        The input image as a numpy array with shape (H, W, C) or (H, W).
+    segment : list[tuple[int, int]]
+        List of four (x, y) coordinates defining the quadrilateral region to be
+        straightened and cropped. Points should be in clockwise or counter-clockwise
+        order starting from any corner.
+
+    Returns
+    -------
+    np.ndarray
+        The straightened and cropped rectangular image.
+
+    Raises
+    ------
+    ValueError
+        If the segment doesn't contain exactly 4 points.
+
+    Notes
+    -----
+    The function uses perspective transformation to rectify the quadrilateral
+    region into a rectangular image.
+    """
+    # Validate the segment has exactly 4 points
+    if len(segment) != 4:
+        raise ValueError(f"Invalid segment: Expected 4 points, got {len(segment)} points.")
+
+    # Convert segment points to numpy array for transformation
+    quad_points = np.array(segment, dtype="float32")
+
+    # Calculate dimensions of the output rectangle
+    # Width is the distance between first two points
+    rect_width = int(np.linalg.norm(quad_points[0] - quad_points[1]))
+    # Height is the distance between second and third points
+    rect_height = int(np.linalg.norm(quad_points[1] - quad_points[2]))
+
+    # Define the destination points for the rectangular output
+    rect_points = np.array(
+        [
+            [0, 0],  # Top-left
+            [rect_width - 1, 0],  # Top-right
+            [rect_width - 1, rect_height - 1],  # Bottom-right
+            [0, rect_height - 1],  # Bottom-left
+        ],
+        dtype="float32",
+    )
+
+    # Compute the perspective transform matrix
+    transform_matrix = cv2.getPerspectiveTransform(quad_points, rect_points)
+
+    # Apply the perspective transformation to get the straightened image
+    straightened_image = cv2.warpPerspective(image, transform_matrix, (rect_width, rect_height))
+
+    return straightened_image
+
+
 def calc_mean_color_patch(img: np.ndarray) -> np.ndarray:
     """
     Compute the mean color of an image patch across spatial dimensions.
