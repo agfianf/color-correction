@@ -1,5 +1,44 @@
 # Changelog
 
+## [v0.0.1-rc4] - 2025-04-11
+**Release Candidate with MCCardDetector and Segmentation Support**
+
+This release introduces the `MCCardDetector` for improved color checker card detection, adds segmentation support, and includes minor fixes and dependency updates.
+
+### Added
+- Implemented `MCCardDetector` class in `color_correction/core/card_detection/mcc_det.py` for detecting color checker cards and patches using OpenCV's `mcc` module.
+- Added segmentation support to handle quadrilateral regions via `SegmentPoint` type and updated `DetectionResult` schema to include `segment` field.
+- Introduced `crop_segment_straighten` utility in `image_processing.py` to straighten and crop quadrilateral regions using perspective transformation.
+- Extended `DetectionProcessor` to process both bounding box and segmentation-based detection results.
+- Added `draw_segmentation` function in `yolo_utils.py` to visualize segmentation polygons on images.
+- Updated `ColorCorrection` service to support both `YOLOv8CardDetector` and `MCCardDetector` based on model name (`yolov8` or `mcc`).
+
+### Changed
+- Bumped version to `0.0.1-rc4` in `__init__.py` and `pyproject.toml`.
+- Updated `DetectionProcessor.extract_color_patches` to handle segmentation results alongside bounding boxes.
+- Modified `ColorCorrectionAnalyzer` to use `set_reference_patches` instead of `set_reference_image` for consistency.
+- Adjusted dependency versions in `pyproject.toml` for compatibility:
+  - `pydantic>=2.10.6`
+  - `pydantic-settings>=2.8.1`
+  - `shapely>=2.0.7`
+  - `matplotlib>=3.10.1`
+  - `onnx==1.17.0`
+  - `onnxruntime==1.20.1`
+  - `pandas==2.2.3`
+  - `opencv-contrib-python>=4.11.0.86`
+  - Dev dependencies: `pytest==8.3.5`, `ruff==0.11.2`, `pre-commit==4.2.0`, `ultralytics==8.3.96`
+- Changed `ruff` line-length to 120 in `pyproject.toml` for better code formatting flexibility.
+
+### Fixed
+- Ensured `DetectionResult` schema compatibility with both bounding box and segmentation outputs by making `boxes` and `segment` optional.
+- Added debug logging in `ColorCorrection` to track grid image shapes during color difference calculations.
+
+## [v0.0.1-rc3] - 2025-03-15
+**Release Candidate with Enhanced Stability**
+- Improved error handling in detection and correction pipelines.
+- Optimized performance of `YOLOv8CardDetector` with better GPU utilization.
+- Minor bug fixes in geometry processing utilities.
+
 ## [v0.0.1-rc2] - 2025-02-10
 **Release Candidate with Full Feature Set and Documentation**
 This release introduces several improvements:
