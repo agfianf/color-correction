@@ -47,7 +47,7 @@ This is the main feature of this package. Its capture to color correct an image 
 
     # Step 3: Initialize the color correction model with specified parameters
     color_corrector = ColorCorrection(
-        detection_model="yolov8",
+        detection_model="yolov8", # or "mcc"
         detection_conf_th=0.25,
         correction_model="affine_reg", # (1)
         degree=3,  # (2)
