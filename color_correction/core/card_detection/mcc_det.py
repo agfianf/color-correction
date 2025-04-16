@@ -8,11 +8,55 @@ from color_correction.utils.image_processing import crop_segment_straighten
 
 
 class MCCardDetector(BaseCardDetector):
+    """MCCardDetector implements card detection using OpenCV's ColorChecker detector (cv2.mcc).
+
+    This class detects ColorChecker cards and their color patches in an image using OpenCV's
+    built-in MCC ([Macbeth ColorChecker](https://docs.opencv.org/4.11.0/dd/d19/group__mcc.html)) detection module.
+    It provides methods to detect cards, extract patch coordinates, and visualize detections.
+
+    Parameters
+    ----------
+    use_gpu : bool, optional
+        Whether to use GPU for detection (not used in OpenCV MCC), by default False.
+    conf_th : float, optional
+        Confidence threshold for detection filtering, by default 0.15.
+    """
+
     def __init__(self, use_gpu: bool = False, conf_th: float = 0.15) -> None:
+        """
+        Initialize the MCCardDetector.
+
+        Parameters
+        ----------
+        use_gpu : bool, optional
+            Whether to use GPU for detection (not used in OpenCV MCC), by default False.
+        conf_th : float, optional
+            Confidence threshold for detection filtering, by default 0.15.
+        """
         self.use_gpu = use_gpu
         self.conf_th = conf_th
 
-    def detect(self, image: np.ndarray, conf: float = 0.15) -> DetectionResult:
+    def detect(self, image: np.ndarray, conf: float | None = None) -> DetectionResult:
+        """
+        Detect ColorChecker cards and their color patches in the input image.
+
+        Parameters
+        ----------
+        image : np.ndarray
+            Input image (BGR) in which to detect ColorChecker cards.
+        conf : float, optional
+            Confidence threshold for detection filtering, by default 0.15.
+
+        Returns
+        -------
+        DetectionResult
+            A dataclass containing detected segments (card and patch polygons),
+            confidence scores, and class IDs. Boxes are not used in this case (None).
+        """
+
+        if conf is None:
+            conf = self.conf_th
+
         ls_segments = []
         ls_class_ids = []
         ls_scores = []
@@ -63,6 +107,21 @@ class MCCardDetector(BaseCardDetector):
         )
 
     def _extract_chart_coordinates(self, image_copy: np.ndarray, charts_rgb: np.ndarray) -> list[list[tuple[int, int]]]:
+        """
+        Extracts the coordinates of color patches from the detected ColorChecker.
+
+        Parameters
+        ----------
+        image_copy : np.ndarray
+            Copy of the input image for visualization (patch points drawn).
+        charts_rgb : np.ndarray
+            Array of shape (N, 2) containing the (x, y) coordinates of patch corners.
+
+        Returns
+        -------
+        list of list of tuple of int
+            List of patches, each patch is a list of 4 (x, y) tuples.
+        """
         random_color = (np.random.randint(0, 255), np.random.randint(0, 255), np.random.randint(0, 255))
         ls_chart_coord = []
         ls_group_patch = []
@@ -94,6 +153,18 @@ class MCCardDetector(BaseCardDetector):
         return ls_chart_coord
 
     def _draw_box_color_path(self, image_copy: np.ndarray, i: int, group_patch: list[tuple[int, int]]) -> None:
+        """
+        Draws a polygon and label for a color patch on the image.
+
+        Parameters
+        ----------
+        image_copy : np.ndarray
+            Image on which to draw the patch.
+        i : int
+            Index or label for the patch.
+        group_patch : list of tuple of int
+            List of 4 (x, y) tuples representing the patch corners.
+        """
         random_color = (np.random.randint(0, 255), np.random.randint(0, 255), np.random.randint(0, 255))
         # draw patch
         cv2.polylines(image_copy, [np.int32(group_patch)], True, random_color, 2)

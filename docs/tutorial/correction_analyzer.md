@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This package provides a class for analyzing color correction by combining various correction methods with object detection models. The analyzer offers multiple correction methods and customizable parameters that you can experiment with. For object detection, it currently supports `YOLOv8` (ONNX), with plans to expand to more models in the future. For correction methods, it supports `least squares`, `linear regression`, `affine regression`, and `polynomial regression`.
+This package provides a class for analyzing color correction by combining various correction methods with object detection models. The analyzer offers multiple correction methods and customizable parameters that you can experiment with. For object detection, it currently supports `YOLOv8` (ONNX) and [`Macbeth Detector`](../reference/core/card_detection/mcc_detector.md), with plans to expand to more models in the future. For correction methods, it supports `least squares`, `linear regression`, `affine regression`, and `polynomial regression`.
 
 The analyzer automatically runs all defined methods and generates a comprehensive report comparing visual results and `ΔE CIE 2000` values. You don't need to write complex code - simply define your desired methods and parameters, and let the analyzer do the work for you. This makes it easy to find the best color correction approach for your specific needs.
 
@@ -18,13 +18,14 @@ The analyzer automatically runs all defined methods and generates a comprehensiv
         curl -L -o input_image.jpg "https://drive.google.com/uc?export=download&id=1syOqw9kC0tt01p7yEobU4MeLfh336DZA"
         ```
 
-    ```python
+    ```python title="analyzer.py" linenums="1"
     # your_script.py
     import cv2
 
     from color_correction import ColorCorrectionAnalyzer
 
     input_image_path = "your_path_image"
+    ref_image_path = "your_path_ref_image"
 
     report = ColorCorrectionAnalyzer(
         list_correction_methods=[
@@ -38,13 +39,14 @@ The analyzer automatically runs all defined methods and generates a comprehensiv
         ],
         list_detection_methods=[
             ("yolov8", {"detection_conf_th": 0.25}),
+            ("mcc", {"detection_conf_th": 0.15}),
         ],
         use_gpu=False,
     )
 
     df_report = report.run(
         input_image=cv2.imread(input_image_path),
-        reference_image=None,
+        reference_image=cv2.imread(ref_image_path), # (2)
         output_dir="report-output", # (1)
     )
 
@@ -52,6 +54,7 @@ The analyzer automatically runs all defined methods and generates a comprehensiv
     ```
 
     1. 💬 The output directory where the report files will be saved.
+    2. 💬 The reference image is used for color correction and comparison. **This is Optional**
 
 === "Project Structure"
 

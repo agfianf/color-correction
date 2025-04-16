@@ -198,13 +198,18 @@ def draw_segmentation(
         color = COLORS[class_id]
         cv2.polylines(image, [np.int32(segment)], True, color, 2)
 
-        draw_text(
+        font_size = min(image.shape[:2]) * 0.0005
+        text_thickness = int(min(image.shape[:2]) * 0.001)
+
+        cv2.putText(
             image,
             f"{class_names[class_id]} {int(score * 100)}%",
             segment[0],
-            color,
-            font_size=0.001,
-            text_thickness=2,
+            cv2.FONT_HERSHEY_SIMPLEX,
+            font_size,
+            (255, 255, 255),
+            text_thickness,
+            cv2.LINE_AA,
         )
     return image
 

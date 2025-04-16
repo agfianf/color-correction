@@ -69,7 +69,7 @@ class ColorCorrection:
 
     def __init__(
         self,
-        detection_model: LiteralModelDetection = "yolov8",
+        detection_model: LiteralModelDetection = "mcc",
         detection_conf_th: float = 0.25,
         correction_model: LiteralModelCorrection = "least_squares",
         reference_image: ImageBGR | None = None,

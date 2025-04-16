@@ -49,7 +49,7 @@ pip install color-correction
 ## 🤸 TODO
 
 - [ ] Add Loggers
-- [ ] Add detection MCC:CCheckerDetector from opencv
+- [x] Add detection MCC:CCheckerDetector from opencv
 - [ ] Add Segmentation Color Checker using YOLOv11 ONNX
 - [ ] Improve validation preprocessing (e.g., auto-match-orientation CC)
 - [ ] Add more analysis and evaluation metrics _(still thinking...)_
