@@ -164,6 +164,7 @@ nav:
       - core:
         - card_detection:
           - YoloV8 ONNX: reference/core/card_detection/yv8_onnx.md
+          - MCC Detector: reference/core/card_detection/mcc_detector.md
         - correction:
           - Least Squares: reference/core/correction/least_squares.md
           - Linear Regression: reference/core/correction/linear_reg.md
