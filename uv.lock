@@ -1,5 +1,4 @@
 version = 1
-revision = 1
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version < '3.11' and sys_platform == 'darwin'",
@@ -156,7 +155,7 @@ wheels = [
 
 [[package]]
 name = "color-correction"
-version = "0.0.1rc4"
+version = "0.0.1rc5"
 source = { editable = "." }
 dependencies = [
     { name = "colour-science" },

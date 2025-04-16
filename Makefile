@@ -28,3 +28,6 @@ sync-docs:
 
 sync-all:
 	uv sync --all-groups  --no-group dev-model
+
+docs-run:
+	uv run mkdocs serve -a localhost:8000

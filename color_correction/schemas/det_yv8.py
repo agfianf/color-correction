@@ -81,5 +81,5 @@ class DetectionResult(BaseModel):
         """
         if self.boxes is not None:
             return draw_detections(image, self.boxes, self.scores, self.class_ids)
-        elif self.segment is not None:
+        if self.segment is not None:
             return draw_segmentation(image, self.segment, self.scores, self.class_ids)
