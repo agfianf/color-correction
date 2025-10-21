@@ -28,6 +28,14 @@ pip install color-correction
 ## 🏋️‍♀️ How it works
 ![How it works](assets/color-correction-how-it-works.png)
 
+## ✨ Features
+- **Multiple Detection Methods**:
+  - **YOLOv8**: Fast and accurate ONNX-based detection
+  - **MCCardDetector**: OpenCV's mcc module for robust color checker detection
+- **Segmentation Support**: Detect color checker cards using quadrilateral segmentation regions
+- **Multiple Correction Models**: Choose from `polynomial`, `least_squares`, `affine_reg`, or `linear_reg`
+- **GPU Support**: Optional GPU acceleration for faster processing
+- **Comprehensive Analysis**: Built-in analyzer for comparing different correction methods and detection approaches
 
 ## ⚡ How to use
 
@@ -42,7 +50,7 @@ input_image = cv2.imread(image_path)
 
 # Step 3: Initialize the color correction model with specified parameters
 color_corrector = ColorCorrection(
-    detection_model="yolov8",
+    detection_model="yolov8",  # "yolov8" or "mcc" (MCCardDetector)
     detection_conf_th=0.25,
     correction_model="polynomial", # "least_squares", "affine_reg", "linear_reg"
     degree=3,  # for polynomial correction model
@@ -121,6 +129,7 @@ report = ColorCorrectionAnalyzer(
     ],
     list_detection_methods=[
         ("yolov8", {"detection_conf_th": 0.25}),
+        # ("mcc", {}),  # MCCardDetector using OpenCV's mcc module
     ],
 )
 report.run(
@@ -143,8 +152,8 @@ report.run(
 
 ## 🤸 TODO
 - [ ] Add Loggers
-- [x] Add detection MCC:CCheckerDetector from opencv
-- [ ] Add Segmentation Color Checker using YOLOv11 ONNX
+- [x] Add detection MCCardDetector from OpenCV's mcc module
+- [x] Add Segmentation support for Color Checker detection
 - [ ] Improve validation preprocessing (e.g., auto-match-orientation CC)
 - [ ] Add more analysis and evaluation metrics (Still thinking...)
 
