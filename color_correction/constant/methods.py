@@ -7,4 +7,4 @@ LiteralModelCorrection = Literal[
     "affine_reg",
 ]
 
-LiteralModelDetection = Literal["yolov8"]
+LiteralModelDetection = Literal["yolov8", "mcc"]

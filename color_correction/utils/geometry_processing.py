@@ -1,6 +1,18 @@
 import numpy as np
 import shapely
 
+from color_correction.constant.grid_config import (
+    GRID_COLS,
+    GRID_ROWS,
+    NEIGHBOR_BOTTOM_OFFSET,
+    NEIGHBOR_LEFT_OFFSET,
+    NEIGHBOR_RIGHT_OFFSET,
+    NEIGHBOR_TOP_OFFSET,
+    ROW_END_INDICES,
+    ROW_START_INDICES,
+    TOTAL_PATCHES,
+)
+
 box_tuple = tuple[int, int, int, int]
 
 
@@ -100,12 +112,12 @@ def generate_expected_patches(card_box: box_tuple) -> list[box_tuple]:
     card_height = card_y2 - card_y1
 
     # get expected grid of cards
-    patch_width = card_width / 6
-    patch_height = card_height / 4
+    patch_width = card_width / GRID_COLS
+    patch_height = card_height / GRID_ROWS
 
     expected_patches = []
-    for row in range(4):
-        for col in range(6):
+    for row in range(GRID_ROWS):
+        for col in range(GRID_COLS):
             x1 = int(card_x1 + col * patch_width)
             y1 = int(card_y1 + row * patch_height)
             x2 = int(x1 + patch_width)
@@ -184,17 +196,17 @@ def calculate_patch_statistics(ls_ordered_patch: list[box_tuple]) -> tuple:
         ls_w_grid.append(patch[2] - patch[0])
         ls_h_grid.append(patch[3] - patch[1])
 
-        if idx not in [5, 11, 17, 23] or idx == 0:
+        if idx not in ROW_END_INDICES or idx == 0:
             x1 = patch[0]
             next_x1 = ls_ordered_patch[idx + 1]
             if next_x1 is not None:
                 dx = next_x1[0] - x1
                 ls_dx.append(dx)
 
-        syarat = idx + 6
+        syarat = idx + GRID_COLS
         if syarat < len(ls_ordered_patch):
             y1 = patch[1]
-            next_y1 = ls_ordered_patch[idx + 6]
+            next_y1 = ls_ordered_patch[idx + GRID_COLS]
             if next_y1 is not None:
                 dy = next_y1[1] - y1
                 ls_dy.append(dy)
@@ -240,21 +252,21 @@ def suggest_missing_patch_coordinates(  # noqa: C901
         neigh_top = None
         neigh_bottom = None
 
-        id_neigh_right = idx + 1
-        id_neigh_left = idx - 1
-        id_neigh_top = idx - 6
-        id_neigh_bottom = idx + 6
+        id_neigh_right = idx + NEIGHBOR_RIGHT_OFFSET
+        id_neigh_left = idx + NEIGHBOR_LEFT_OFFSET
+        id_neigh_top = idx + NEIGHBOR_TOP_OFFSET
+        id_neigh_bottom = idx + NEIGHBOR_BOTTOM_OFFSET
 
-        if id_neigh_right not in [0, 6, 12, 18] and id_neigh_right <= 23:
+        if id_neigh_right not in ROW_START_INDICES and id_neigh_right < TOTAL_PATCHES:
             neigh_right = ls_ordered_patch[id_neigh_right]
 
-        if id_neigh_left not in [5, 11, 17, 23] and id_neigh_left >= 0:
+        if id_neigh_left not in ROW_END_INDICES and id_neigh_left >= 0:
             neigh_left = ls_ordered_patch[id_neigh_left]
 
         if id_neigh_top >= 0:
             neigh_top = ls_ordered_patch[id_neigh_top]
 
-        if id_neigh_bottom <= 23:
+        if id_neigh_bottom < TOTAL_PATCHES:
             neigh_bottom = ls_ordered_patch[id_neigh_bottom]
 
         suggested_patch = None
