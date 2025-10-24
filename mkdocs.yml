@@ -178,6 +178,7 @@ nav:
       - schemas:
         - YoloV8 ONNX: reference/schemas/yv8_onnx.md
         - Custom Types: reference/schemas/custom_types.md
+      - Exceptions: reference/exceptions.md
       - utils:
         - correction: reference/utils/correction.md
         - device_info: reference/utils/device_info.md
