@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- **Python Version Requirement**: Dropped support for Python 3.10. The package now requires Python 3.11 or higher.
+- Updated CI/CD workflow to test only Python 3.11 and 3.12 across all platforms (Ubuntu, Windows, macOS).
+- Updated `pyproject.toml` to reflect `requires-python = ">=3.11"`.
+- Simplified dependency lock file (`uv.lock`) by removing Python 3.10-specific markers.
+
 ## [v0.0.1-rc4] - 2025-04-11
 **Release Candidate with MCCardDetector and Segmentation Support**
 

@@ -21,6 +21,9 @@ This package is designed to perform color correction on images using the Color C
 
 ## 📦 Installation
 
+**Requirements:**
+- Python 3.11 or higher
+
 ```bash
 pip install color-correction
 ```
@@ -107,6 +110,53 @@ print(eval_result)
 ![Sample Output](assets/sample-output-debug.jpg)
 
 </details>
+
+## 🛡️ Error Handling
+
+The package provides clear, actionable error messages through custom exceptions:
+
+```python
+from color_correction import ColorCorrection
+from color_correction.exceptions import (
+    UnsupportedModelError,
+    PatchesNotSetError,
+    ModelNotFittedError,
+    InvalidImageError,
+)
+
+try:
+    # Initialize with invalid model
+    cc = ColorCorrection(detection_model="invalid_model")
+except UnsupportedModelError as e:
+    print(f"Error: {e}")
+    # Output: "Unsupported model: 'invalid_model'. Supported models are: yolov8, mcc"
+
+try:
+    cc = ColorCorrection()
+    # Forgot to set input patches
+    cc.fit()
+except PatchesNotSetError as e:
+    print(f"Error: {e}")
+    # Output: "Input patches must be set before this operation. Call set_input_patches() first."
+
+try:
+    cc = ColorCorrection()
+    # Forgot to fit the model
+    corrected = cc.predict(image)
+except ModelNotFittedError as e:
+    print(f"Error: {e}")
+    # Output: "Model must be fitted before prediction. Call fit() first."
+
+try:
+    cc = ColorCorrection()
+    # Invalid image format
+    cc.set_input_patches(grayscale_image)  # 2D array instead of 3D
+except InvalidImageError as e:
+    print(f"Error: {e}")
+    # Output: "Invalid image: image must have 3 dimensions (H, W, C), got 2"
+```
+
+For more details, see the [Exception Reference](https://agfianf.github.io/color-correction/reference/exceptions/).
 
 ## 🔎 Reporting
 ```python

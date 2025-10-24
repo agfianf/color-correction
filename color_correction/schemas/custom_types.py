@@ -34,21 +34,15 @@ TrainedCorrection : MatrixWeightLeastSquare | LinearRegression | Pipeline
 
 """
 
-from typing import Literal
-
 import numpy as np
 from numpy.typing import NDArray
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 
-LiteralModelCorrection = Literal[
-    "least_squares",
-    "polynomial",
-    "linear_reg",
-    "affine_reg",
-]
-
-LiteralModelDetection = Literal["yolov8", "mcc"]
+from color_correction.constant.methods import (
+    LiteralModelCorrection,
+    LiteralModelDetection,
+)
 
 ColorPatchType = NDArray[np.uint8]
 ImageType = NDArray[np.uint8]
@@ -60,3 +54,18 @@ SegmentPoint = list[tuple[int, int]]
 MatrixWeightLeastSquare = NDArray[np.float64]
 
 TrainedCorrection = MatrixWeightLeastSquare | LinearRegression | Pipeline
+
+# Re-export for backward compatibility
+__all__ = [
+    "ColorPatchType",
+    "ImageType",
+    "ImageBGR",
+    "ImageRGB",
+    "ImageGray",
+    "BoundingBox",
+    "SegmentPoint",
+    "MatrixWeightLeastSquare",
+    "TrainedCorrection",
+    "LiteralModelCorrection",
+    "LiteralModelDetection",
+]
