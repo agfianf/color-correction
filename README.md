@@ -21,6 +21,9 @@ This package is designed to perform color correction on images using the Color C
 
 ## 📦 Installation
 
+**Requirements:**
+- Python 3.11 or higher
+
 ```bash
 pip install color-correction
 ```
