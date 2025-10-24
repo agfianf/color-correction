@@ -7,6 +7,11 @@ from color_correction.constant.color_checker import reference_color_d50_bgr
 from color_correction.core.card_detection.det_yv8_onnx import YOLOv8CardDetector
 from color_correction.core.card_detection.mcc_det import MCCardDetector
 from color_correction.core.correction import CorrectionModelFactory
+from color_correction.exceptions import (
+    ModelNotFittedError,
+    PatchesNotSetError,
+    UnsupportedModelError,
+)
 from color_correction.processor.detection import DetectionProcessor
 from color_correction.schemas.custom_types import (
     ColorPatchType,
@@ -20,6 +25,7 @@ from color_correction.utils.image_patch import (
     visualize_patch_comparison,
 )
 from color_correction.utils.image_processing import calc_color_diff
+from color_correction.utils.validators import validate_bgr_image
 from color_correction.utils.visualization_utils import (
     create_image_grid_visualization,
 )
@@ -76,6 +82,10 @@ class ColorCorrection:
         use_gpu: bool = False,
         **kwargs: dict,
     ) -> None:
+        # Validate reference_image if provided
+        if reference_image is not None:
+            validate_bgr_image(reference_image, param_name="reference_image")
+
         # Initialize reference image attributes
         self.reference_patches = None
         self.reference_grid_image = None
@@ -129,11 +139,12 @@ class ColorCorrection:
 
         Raises
         ------
-        ValueError
+        UnsupportedModelError
             If the model name is not supported.
         """
-        if model_name not in ["yolov8", "mcc"]:
-            raise ValueError(f"Unsupported detection model: {model_name}")
+        supported_models = ["yolov8", "mcc"]
+        if model_name not in supported_models:
+            raise UnsupportedModelError(model_name, supported_models)
         if model_name == "mcc":
             return MCCardDetector(use_gpu=use_gpu, conf_th=conf_th)
         return YOLOv8CardDetector(use_gpu=use_gpu, conf_th=conf_th)
@@ -330,44 +341,54 @@ class ColorCorrection:
             ) = self._extract_color_patches(image=image, debug=debug)
 
     def set_input_patches(self, image: np.ndarray, debug: bool = False) -> None:
-        """
-        This function processes an input image to extract color patches and generates
-        corresponding grid and debug visualizations 🔍
+        """Extract color patches from input image.
 
+        This function processes an input image to detect color checker patches and
+        generates corresponding grid and debug visualizations.
 
         Parameters
         ----------
         image : np.ndarray
-            Input image to extract color patches from 📸
+            Input image to extract color patches from.
         debug : bool, optional
-            If True, generates additional debug visualization, by default False 🐛
+            If True, generates additional debug visualization. Default is False.
 
         Returns
         -------
         tuple
             Contains three elements:
 
-            - `self.input_patches` : np.ndarray
+            - input_patches : list[ColorPatchType]
                 Extracted color patches from the image
-            - `self.input_grid_image` : np.ndarray
+            - input_grid_image : ImageBGR
                 Visualization of the detected grid
-            - `self.input_debug_image` : np.ndarray
+            - input_debug_image : ImageBGR | None
                 Debug visualization (if debug=True)
+
+        Raises
+        ------
+        InvalidImageError
+            If image is None, has wrong dimensions, or wrong number of channels.
 
         Notes
         -----
-        The function will set class attributes:
+        The function will set the following instance attributes:
 
-        - `self.input_patches`
-        - `self.input_grid_image`
-        - `self.input_debug_image`
+        - self.input_patches
+        - self.input_grid_image
+        - self.input_debug_image
 
-        The function first resets these attributes to None before processing 🔄
+        These attributes are reset to None before processing.
         """
+        # Validate input image
+        validate_bgr_image(image, param_name="image")
+
+        # Reset attributes
         self.input_patches = None
         self.input_grid_image = None
         self.input_debug_image = None
 
+        # Extract patches
         (
             self.input_patches,
             self.input_grid_image,
@@ -391,7 +412,7 @@ class ColorCorrection:
 
         Raises
         ------
-        RuntimeError
+        PatchesNotSetError
             If the reference patches or input patches are not set.
 
         Notes
@@ -407,10 +428,10 @@ class ColorCorrection:
         before calling this method.
         """
         if self.reference_patches is None:
-            raise RuntimeError("Reference patches must be set before fitting model")
+            raise PatchesNotSetError("reference")
 
         if self.input_patches is None:
-            raise RuntimeError("Input patches must be set before fitting model")
+            raise PatchesNotSetError("input")
 
         self.trained_model = self.correction_model.fit(
             x_patches=self.input_patches,
@@ -449,11 +470,16 @@ class ColorCorrection:
 
         Raises
         ------
-        RuntimeError
+        ModelNotFittedError
             If model has not been fitted.
+        InvalidImageError
+            If input_image is None or has invalid format.
         """
+        # Validate input image
+        validate_bgr_image(input_image, param_name="input_image")
+
         if self.trained_model is None:
-            raise RuntimeError("Model must be fitted before correction")
+            raise ModelNotFittedError()
 
         corrected_image = self.correction_model.compute_correction(
             input_image=input_image.copy(),
