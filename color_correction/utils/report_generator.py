@@ -1,6 +1,7 @@
 # report_generator.py
 from datetime import datetime
 from importlib import resources
+from typing import Any
 
 import pandas as pd
 
@@ -60,15 +61,15 @@ class ReportGenerator:
         )
         return final_html
 
-    def generate_table(self, headers: list, rows: list) -> str:
+    def generate_table(self, headers: list[Any], rows: list[str]) -> str:
         """
         Generate an HTML table from headers and row data.
 
         Parameters
         ----------
-        headers : list
-            List of table headers.
-        rows : list
+        headers : list[Any]
+            List of table headers (typically strings or column names).
+        rows : list[str]
             List of rows where each row is a string of HTML table cells.
 
         Returns

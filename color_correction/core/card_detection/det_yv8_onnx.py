@@ -43,11 +43,11 @@ class YOLOv8CardDetector(BaseCardDetector):
         Flag indicating whether to use GPU for inference
     session : onnxruntime.InferenceSession
         ONNX Runtime session for model inference
-    input_names : list
+    input_names : list[str]
         Names of model input nodes
-    output_names : list
+    output_names : list[str]
         Names of model output nodes
-    input_shape : tuple
+    input_shape : tuple[int, ...]
         Shape of the input tensor
     input_height : int
         Height of the input image required by the model

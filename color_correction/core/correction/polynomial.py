@@ -1,8 +1,9 @@
 import time
+from typing import Any
 
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import make_pipeline
+from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
 
 from color_correction.core.correction.base import BaseComputeCorrection
@@ -18,20 +19,20 @@ class Polynomial(BaseComputeCorrection):
 
     Parameters
     ----------
-    **kwargs : dict, optional
+    **kwargs : Any
         Keyword arguments. Recognized keyword:
 
         - `degree` : int, optional, default 2
              Degree of the polynomial.
     """
 
-    def __init__(self, **kwargs: dict) -> None:
+    def __init__(self, **kwargs: Any) -> None:  # noqa: ANN401
         """
         Initialize the Polynomial correction model.
 
         Parameters
         ----------
-        **kwargs : dict
+        **kwargs : Any
             Keyword arguments for initialization.
 
         Other Parameters
@@ -41,15 +42,15 @@ class Polynomial(BaseComputeCorrection):
             The more complex the polynomial, the more flexible the model.
             But it may also lead to overfitting.
         """
-        self.model = None
-        self.degree = kwargs.get("degree", 2)
+        self.model: Pipeline | None = None
+        self.degree: int = kwargs.get("degree", 2)
 
     def fit(
         self,
         x_patches: np.ndarray,  # input patches
         y_patches: np.ndarray,  # reference patches
-        **kwargs: dict,
-    ) -> np.ndarray:
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Pipeline:
         """
         Fit the polynomial regression model.
 
@@ -59,7 +60,7 @@ class Polynomial(BaseComputeCorrection):
             Input image patches.
         y_patches : np.ndarray
             Reference image patches.
-        **kwargs : dict
+        **kwargs : Any
             Additional keyword arguments. Recognized keyword:
 
             - `degree` : int, optional
@@ -67,8 +68,8 @@ class Polynomial(BaseComputeCorrection):
 
         Returns
         -------
-        np.ndarray
-            Fitted model pipeline.
+        Pipeline
+            Fitted sklearn pipeline with polynomial features and linear regression.
 
         """
         start_time = time.perf_counter()

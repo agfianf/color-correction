@@ -1,4 +1,5 @@
 import os
+from typing import Any, TypedDict
 
 import cv2
 import numpy as np
@@ -31,6 +32,23 @@ from color_correction.utils.visualization_utils import (
 )
 
 
+class ColorDiffMetrics(TypedDict):
+    """Color difference metrics from CIE 2000 calculation."""
+
+    min: float
+    max: float
+    mean: float
+    std: float
+
+
+class ColorDiffResult(TypedDict):
+    """Result structure from calc_color_diff_patches."""
+
+    initial: ColorDiffMetrics
+    corrected: ColorDiffMetrics
+    delta: ColorDiffMetrics
+
+
 class ColorCorrection:
     """Color correction handler using color `card_detection` and `correction_models`.
     This class handles the complete workflow of color correction, including:
@@ -54,7 +72,7 @@ class ColorCorrection:
         If None, uses standard D50 values.
     use_gpu : bool, default=False
         True to use GPU for card detection. False will use CPU.
-    **kwargs : dict
+    **kwargs : Any
         Additional parameters for the correction model.
 
     Other parameters
@@ -80,7 +98,7 @@ class ColorCorrection:
         correction_model: LiteralModelCorrection = "least_squares",
         reference_image: ImageBGR | None = None,
         use_gpu: bool = False,
-        **kwargs: dict,
+        **kwargs: Any,  # noqa: ANN401
     ) -> None:
         # Validate reference_image if provided
         if reference_image is not None:
@@ -494,7 +512,7 @@ class ColorCorrection:
 
         return corrected_image
 
-    def calc_color_diff_patches(self) -> dict:
+    def calc_color_diff_patches(self) -> ColorDiffResult:
         """
         Calculate color difference metrics for image patches using the dE CIE 2000 metric.
 
@@ -513,19 +531,15 @@ class ColorCorrection:
 
         Returns
         -------
-        dict
-            A dictionary with the following keys:
+        ColorDiffResult
+            A TypedDict with the following keys:
 
-            - `initial`: dict containing the color difference metrics for the initial patches versus the reference.
-            - `corrected`: dict containing the color difference metrics for the corrected patches versus the reference.
-            - `delta`: dict with metrics representing the difference between the initial and corrected color differences.
-                      Each metric is computed as:
-                      ```python
-                        metric_delta = metric_initial - metric_corrected,
-                      ```
-                      where metrics include `min`, `max`, `mean`, and `std`.
+            - `initial`: ColorDiffMetrics for the initial patches versus the reference.
+            - `corrected`: ColorDiffMetrics for the corrected patches versus the reference.
+            - `delta`: ColorDiffMetrics representing the difference (initial - corrected).
+                      Each metric includes `min`, `max`, `mean`, and `std`.
 
-        """  # noqa: E501
+        """
         # check input_grid_image, reference_grid_image, corrected_grid_image
         print(
             f"input_grid_image: {self.input_grid_image.shape}, "

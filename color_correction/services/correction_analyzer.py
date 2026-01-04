@@ -1,9 +1,10 @@
 import os
+from typing import Any, TypedDict
 
-import numpy as np
 import pandas as pd
 
 from color_correction.schemas.custom_types import (
+    ImageBGR,
     LiteralModelCorrection,
     LiteralModelDetection,
 )
@@ -13,6 +14,18 @@ from color_correction.utils.image_patch import (
 )
 from color_correction.utils.image_processing import calc_color_diff
 from color_correction.utils.report_generator import ReportGenerator
+
+
+class DetectionParams(TypedDict, total=False):
+    """Parameters for detection methods."""
+
+    detection_conf_th: float
+
+
+class CorrectionParams(TypedDict, total=False):
+    """Parameters for correction methods."""
+
+    degree: int
 
 
 class ColorCorrectionAnalyzer:
@@ -25,10 +38,10 @@ class ColorCorrectionAnalyzer:
 
     Parameters
     ----------
-    list_correction_methods : list of tuple[LiteralModelCorrection, dict]
+    list_correction_methods : list[tuple[LiteralModelCorrection, CorrectionParams]]
         A list of tuples, where each tuple contains a correction method identifier
         and its parameters.
-    list_detection_methods : list of tuple[LiteralModelDetection, dict]
+    list_detection_methods : list[tuple[LiteralModelDetection, DetectionParams]]
         A list of tuples, where each tuple contains a detection method identifier
         and its parameters.
     use_gpu : bool, optional
@@ -37,8 +50,8 @@ class ColorCorrectionAnalyzer:
 
     def __init__(
         self,
-        list_correction_methods: list[tuple[LiteralModelCorrection, dict]],
-        list_detection_methods: list[tuple[LiteralModelDetection, dict]],
+        list_correction_methods: list[tuple[LiteralModelCorrection, CorrectionParams]],
+        list_detection_methods: list[tuple[LiteralModelDetection, DetectionParams]],
         use_gpu: bool = False,
     ) -> None:
         """
@@ -46,9 +59,9 @@ class ColorCorrectionAnalyzer:
 
         Parameters
         ----------
-        list_correction_methods : list of tuple[LiteralModelCorrection, dict]]
+        list_correction_methods : list[tuple[LiteralModelCorrection, CorrectionParams]]
             List of correction methods and their parameters.
-        list_detection_methods : list of tuple[LiteralModelDetection, dict]]
+        list_detection_methods : list[tuple[LiteralModelDetection, DetectionParams]]
             List of detection methods and their parameters.
         use_gpu : bool, optional
             Whether to use GPU acceleration, by default True.
@@ -61,13 +74,13 @@ class ColorCorrectionAnalyzer:
     def _run_single_exp(
         self,
         idx: int,
-        input_image: np.ndarray,
+        input_image: ImageBGR,
         det_method: LiteralModelDetection,
-        det_params: dict,
+        det_params: DetectionParams,
         cc_method: LiteralModelCorrection,
-        cc_params: dict,
-        reference_image: np.ndarray | None = None,
-    ) -> dict:
+        cc_params: CorrectionParams,
+        reference_image: ImageBGR | None = None,
+    ) -> dict[str, Any]:
         """
         Run a single experiment for a given detection and correction method.
 
@@ -75,22 +88,22 @@ class ColorCorrectionAnalyzer:
         ----------
         idx : int
             Index of the experiment.
-        input_image : np.ndarray
-            The input image array.
+        input_image : ImageBGR
+            The input image array in BGR format.
         det_method : LiteralModelDetection
             The detection method identifier.
-        det_params : dict
+        det_params : DetectionParams
             Parameters for the detection method.
         cc_method : LiteralModelCorrection
             The correction method identifier.
-        cc_params : dict
+        cc_params : CorrectionParams
             Parameters for the correction method.
-        reference_image : np.ndarray, optional
+        reference_image : ImageBGR | None, optional
             The reference image, by default None.
 
         Returns
         -------
-        dict
+        dict[str, Any]
             A dictionary containing evaluation data and results of the experiment.
         """
         cc = ColorCorrection(
@@ -152,20 +165,20 @@ class ColorCorrectionAnalyzer:
 
     def run(
         self,
-        input_image: np.ndarray,
+        input_image: ImageBGR,
         output_dir: str = "benchmark_debug",
-        reference_image: np.ndarray | None = None,
+        reference_image: ImageBGR | None = None,
     ) -> pd.DataFrame:
         """
         Run the full benchmark for color correction and generate reports.
 
         Parameters
         ----------
-        input_image : np.ndarray
-            The image to be processed.
+        input_image : ImageBGR
+            The image to be processed in BGR format.
         output_dir : str, optional
             The directory to save reports, by default `benchmark_debug`.
-        reference_image : np.ndarray, optional
+        reference_image : ImageBGR | None, optional
             Optional reference image used for evaluation, by default None.
 
         Returns
