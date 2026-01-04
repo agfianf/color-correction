@@ -1,6 +1,7 @@
 import platform
 import subprocess
-from typing import Any
+from collections.abc import Callable
+from typing import TypedDict
 
 from color_correction.schemas.device import (
     CPUArchitecture,
@@ -9,18 +10,27 @@ from color_correction.schemas.device import (
 )
 
 
-def detect_darwin(specs: dict[str, Any]) -> dict[str, Any]:
+class DeviceSpecsDict(TypedDict, total=False):
+    """TypedDict for device specifications before validation."""
+
+    os_name: str
+    cpu_arch: CPUArchitecture
+    gpu_type: GPUType
+    is_apple_silicon: bool
+
+
+def detect_darwin(specs: DeviceSpecsDict) -> DeviceSpecsDict:
     """
     Detect hardware specifications on macOS, including CPU and GPU details.
 
     Parameters
     ----------
-    specs : dict
+    specs : DeviceSpecsDict
         Initial dictionary containing OS information.
 
     Returns
     -------
-    dict
+    DeviceSpecsDict
         Updated dictionary with CPU architecture and GPU type for macOS.
     """
     try:
@@ -52,18 +62,18 @@ def detect_darwin(specs: dict[str, Any]) -> dict[str, Any]:
     return specs
 
 
-def detect_linux(specs: dict[str, Any]) -> dict[str, Any]:
+def detect_linux(specs: DeviceSpecsDict) -> DeviceSpecsDict:
     """
     Detect hardware specifications on Linux systems.
 
     Parameters
     ----------
-    specs : dict
+    specs : DeviceSpecsDict
         Initial dictionary with OS information.
 
     Returns
     -------
-    dict
+    DeviceSpecsDict
         Updated dictionary with CPU architecture and GPU type for Linux.
     """
     try:
@@ -99,18 +109,18 @@ def detect_linux(specs: dict[str, Any]) -> dict[str, Any]:
     return specs
 
 
-def detect_windows(specs: dict[str, Any]) -> dict[str, Any]:
+def detect_windows(specs: DeviceSpecsDict) -> DeviceSpecsDict:
     """
     Detect hardware specifications on Windows systems.
 
     Parameters
     ----------
-    specs : dict
+    specs : DeviceSpecsDict
         Initial dictionary with OS information.
 
     Returns
     -------
-    dict
+    DeviceSpecsDict
         Updated dictionary with CPU architecture and GPU type for Windows.
     """
     proc = platform.processor().lower()
@@ -137,14 +147,14 @@ def get_device_specs() -> DeviceSpecs:
         An object containing OS name, CPU architecture, GPU type,
         and Apple Silicon flag.
     """
-    specs = {
+    specs: DeviceSpecsDict = {
         "os_name": platform.system(),
         "cpu_arch": CPUArchitecture.UNKNOWN,
         "gpu_type": GPUType.UNKNOWN,
         "is_apple_silicon": False,
     }
 
-    detector_map = {
+    detector_map: dict[str, Callable[[DeviceSpecsDict], DeviceSpecsDict]] = {
         "Darwin": detect_darwin,
         "Linux": detect_linux,
         "Windows": detect_windows,
