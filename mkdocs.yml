@@ -156,10 +156,12 @@ plugins:
 nav:
   - Home: index.md
   - Learn:
-    - Hello: tutorial/getting_started.md
+    - Getting Started: tutorial/getting_started.md
     - Color Correction: tutorial/color_correction.md
     - Correction Analyzer: tutorial/correction_analyzer.md
     - Detector: tutorial/detect_card.md
+    - Troubleshooting: tutorial/troubleshooting.md
+  - Architecture: architecture.md
   - Reference:
       - core:
         - card_detection:
