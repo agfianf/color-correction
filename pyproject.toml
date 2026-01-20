@@ -19,7 +19,6 @@ dependencies = [
     "colour-science>=0.4.6",
     "scikit-learn>=1.6.1",
     "matplotlib>=3.10.1",
-    "onnx==1.17.0",
     "onnxruntime==1.20.1",
     "pandas==2.2.3",
     "opencv-contrib-python>=4.11.0.86",
@@ -56,6 +55,7 @@ dev = [
 ]
 dev-model = [
     "ultralytics==8.3.96",
+    "onnx>=1.15.0",  # For ONNX model export/modification (not needed for inference)
 ]
 
 
