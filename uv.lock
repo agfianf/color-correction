@@ -143,7 +143,6 @@ dependencies = [
     { name = "colour-science" },
     { name = "httpx" },
     { name = "matplotlib" },
-    { name = "onnx" },
     { name = "onnxruntime" },
     { name = "opencv-contrib-python" },
     { name = "pandas" },
@@ -161,6 +160,7 @@ dev = [
     { name = "ruff" },
 ]
 dev-model = [
+    { name = "onnx" },
     { name = "ultralytics" },
 ]
 docs = [
@@ -177,7 +177,6 @@ requires-dist = [
     { name = "colour-science", specifier = ">=0.4.6" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "matplotlib", specifier = ">=3.10.1" },
-    { name = "onnx", specifier = "==1.17.0" },
     { name = "onnxruntime", specifier = "==1.20.1" },
     { name = "opencv-contrib-python", specifier = ">=4.11.0.86" },
     { name = "pandas", specifier = "==2.2.3" },
@@ -194,7 +193,10 @@ dev = [
     { name = "pytest-cov", specifier = "==6.0.0" },
     { name = "ruff", specifier = "==0.11.2" },
 ]
-dev-model = [{ name = "ultralytics", specifier = "==8.3.96" }]
+dev-model = [
+    { name = "onnx", specifier = ">=1.15.0" },
+    { name = "ultralytics", specifier = "==8.3.96" },
+]
 docs = [
     { name = "mkdocs-glightbox", specifier = "==0.4.0" },
     { name = "mkdocs-material", specifier = "==9.6.9" },
